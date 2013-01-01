@@ -7,7 +7,7 @@ DESCRIPTION
 A starting framework for mobile maps using Cordova/Phonegap.
 A minimal but functional, standalone mobile app from which to build your own creations.
 
-This app is designed for Phonegap/Cordova, therefore it is HTMN, JavaScript, and CSS.
+This app is designed for Phonegap/Cordova, therefore it is HTML, JavaScript, and CSS.
 
 Components of this app:
 
@@ -39,10 +39,10 @@ Check out config.xml to start personalizing your app: the name, author attributi
 
 Swap out splash screens and icons. See splash.png and icon.png, then the splash/ and icons/ folders.
 
-Now start customizing HTML (index.html), CSS (index.css), and JavaScript code (index.js)
+Now start customizing HTML (index.html), CSS (index.css), and JavaScript code (index.js), and start swapping out icons and other graphics under the img/ folder.
 
 
 BUGS / TODO / WISHES
 ================
 
-* Add a Bing geocoder, or an onboard geocoder.
+* Add a Bing geocoder, or an onboard geocoder. Or even both, and check the network state to decide...
