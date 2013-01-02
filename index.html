@@ -1,0 +1,97 @@
+<html>
+<head>
+    <title>MobileMapStarter</title>
+
+    <!-- this stub is helpful for Phonegap Build to enable plugins and features. There is no phonegap.js -->
+    <script src="phonegap.js"></script>
+
+    <!-- jQuery and JQ Mobile -->
+    <script type="text/javascript" src="libs/jquery-1.8.3.js"></script>
+    <script type="text/javascript" src="libs/jquery.mobile-1.2.0/jquery.mobile.js"></script>
+    <link rel="stylesheet" type="text/css" href="libs/jquery.mobile-1.2.0/jquery.mobile.css" />
+
+    <!-- The image caching system -->
+    <script type="text/javascript" src="libs/imgcache.js"></script>
+
+    <!-- Leaflet et al -->
+    <link rel="stylesheet" type="text/css" href="libs/leaflet-0.4.5/leaflet.css" />
+    <script type="text/javascript" src="libs/leaflet-0.4.5/leaflet-src.js"></script>
+    <script type="text/javascript" src="libs/leaflet-bing.js"></script>
+
+    <!-- our own custom stuff -->
+    <link rel="stylesheet" type="text/css" href="index.css" />
+    <script type="text/javascript" src="config.js"></script>
+    <script type="text/javascript" src="index.js"></script>
+    <script type="text/javascript" src="library.js"></script>
+</head>
+<body>
+
+
+<div data-role="page" id="page-welcome">
+    <div data-role="header">
+        <h1>Welcome</h1>
+        <a href="#page-map" data-icon="home" data-role="button">OK</a>
+    </div>
+    <div data-role="content">
+        <p>This is the first div tagged as a page, so it is the opening page.</p>
+        <p>This is a good place for welcoming text, descriptions and instructions, and disclaimers.</p>
+        <p><a href="#page-map">OK, Continue</a></p>
+    </div>
+</div>
+
+
+<div data-role="page" id="page-settings">
+    <div data-role="header">
+        <a href="#page-map" data-icon="home" data-role="button">OK</a>
+        <h1>Settings</h1>
+    </div>
+    <div data-role="content">
+
+        <!-- A picker for the basemap. These are contrived to work with the BASEMAPS array. For more info, see selectBasemap() and $('input[type="radio"][name="basemap"]') -->
+        <h1>Base Map</h1>
+        <div data-role="controlgroup">
+        <label><input type="radio" name="basemap" value="terrain" checked="true" /> Terrain</label>
+        <label><input type="radio" name="basemap" value="plain" /> Plain</label>
+        <label><input type="radio" name="basemap" value="bingaerial" /> Bing Aerial</label>
+        </div>
+
+        <h1>Features</h1>
+        <div data-role="controlgroup">
+        <label><input type="checkbox" name="features" value="gps" checked="true" /> Show GPS location</label>
+        <label><input type="checkbox" name="features" value="autocenter" checked="true" /> Auto-center map on movement</label>
+        </div>
+
+        <h1>Cache</h1>
+        <div data-role="controlgroup">
+            <a href="#page-clearcache" data-role="button">Clear map cache</a>
+        </div>
+
+    </div>
+</div>
+
+
+<div data-role="page" id="page-map">
+    <div data-role="content" id="map_canvas"></div>
+    <div id="buttonbar">
+        <a href="#page-settings"><img src="img/settings.png" /></a>
+    </div>
+</div>
+
+
+
+<div data-role="page" id="page-clearcache">
+    <div data-role="header" data-position="inline">
+	<h1>Clear Tiles?</h1>
+    </div>
+
+    <div data-role="content">
+        <p>This will delete the map cache. You will not be able to use the map while offline, until you go online and browse to re-cache the map.</p>
+	    <a href="javascript:void(0);" name="clearcache" data-role="button" data-rel="back" data-theme="b">Clear cache</a>
+	    <a href="#page-settings" data-role="button" data-rel="back">Cancel</a>
+	</div>
+    </div>
+</div>
+
+
+</body>
+</html>

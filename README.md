@@ -1,9 +1,6 @@
 MobileMapStarter
 ================
 
-DESCRIPTION
-================
-
 A starting framework for mobile maps using Cordova/Phonegap.
 A minimal but functional, standalone mobile app from which to build your own creations.
 
@@ -22,15 +19,16 @@ Components of this app:
 * imgcache.js -- Cache Leaflet tiles to device storage, for offline use.
 
 
-COMPILING IT
+COMPILING IT / TESTING IT
 ================
 
-This ready-to-run app is designed for use with Phonegap/Cordova, particularly Phonegap Build. The code as-is can be uploaded to get you a working mobile app in minutes.
+This ready-to-run app is designed for use with Phonegap/Cordova, particularly Phonegap Build. Using Eclipse or XCode may have different results. If you run into issues trying to compile it yourself on XCode or Eclipse, let me know and I'll see what I can do.
 
-Using Eclipse or XCode may have different results. If you run into issues trying to compile it yourself on XCode or Eclipse, let me know and I'll see what I can do.
+The basic app will work in Google Chrome, if you enable file access:
+    chrome.exe --allow-file-access-from-files --allow-file-access
 
 
-WALKTHROUGH: CUSTOMIZING YOUR APP
+WALKTHROUGH: EXPLAINING THE CODE & CUSTOMIZING YOUR APP
 ================
 
 Start with config.js This is basic settings such as default lat/lng/zoom and your Bing API key.
@@ -40,6 +38,8 @@ Check out config.xml to start personalizing your app: the name, author attributi
 Swap out splash screens and icons. See splash.png and icon.png, then the splash/ and icons/ folders.
 
 Now start customizing HTML (index.html), CSS (index.css), and JavaScript code (index.js), and start swapping out icons and other graphics under the img/ folder.
+
+Additional, possibly useful, utility functions are found in library.js
 
 
 BUGS / TODO / WISHES
