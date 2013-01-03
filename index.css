@@ -10,8 +10,20 @@ h1 {
     text-align:center;
 }
 
-#buttonbar {
-    position:absolute; left:50px; top:10px;
-    white-space:nowrap;
-}
+.leaflet-control-settings {
+    position:absolute;
+    right:10px;
+    top:10px;
 
+    width:19px; height:19px;
+
+    padding: 5px;
+    background: rgba(0, 0, 0, 0.25);
+
+    -moz-border-radius: 7px;
+    -webkit-border-radius: 7px;
+    border-radius: 7px;
+}
+.leaflet-control-settings img {
+    width:19px; height:19px;
+}

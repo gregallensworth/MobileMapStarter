@@ -45,4 +45,5 @@ Additional, possibly useful, utility functions are found in library.js
 BUGS / TODO / WISHES
 ================
 
-* Add a Bing geocoder, or an onboard geocoder. Or even both, and check the network state to decide...
+* Nothing, the app is perfect in every way.  ;)
+

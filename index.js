@@ -35,7 +35,7 @@ $(window).load(function () {
     $('div[data-role="page"]').page();
 
     // initialize the tile caching
-    ImgCache.options.debug = true;
+    ImgCache.options.debug = false;
     ImgCache.options.usePersistentCache = true;
     ImgCache.options.chromeQuota = 100 * 1024 * 1024;
 
@@ -85,6 +85,13 @@ $(window).load(function () {
             MAP.locate({ enableHighAccuracy:true, watch:true });
         }  );
     },3000);
+
+    // Leaflet behavior patch: on a zoomend event, check whether we're at MIN_ZOOM or MAX_ZOOM and show/hide the +/- buttons in the Zoom control
+    MAP.on('zoomend', function () {
+        var z = MAP.getZoom();
+        z <= MIN_ZOOM ? $('.leaflet-control-zoom-out').hide() : $('.leaflet-control-zoom-out').show();
+        z >= MAX_ZOOM ? $('.leaflet-control-zoom-in').hide() : $('.leaflet-control-zoom-in').show();
+    });
 });
 
 
@@ -99,7 +106,7 @@ $(window).load(function () {
     $('input[type="radio"][name="basemap"]').change(function () {
         var layername = $(this).val();
         selectBasemap(layername);
-        $.mobile.changePage('#page-map')
+        $.mobile.changePage('#page-map');
     });
 
     // enable the various "features" checkboxes
