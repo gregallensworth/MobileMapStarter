@@ -35,12 +35,11 @@ $(window).load(function () {
     $('div[data-role="page"]').page();
 
     // initialize the tile caching
-    ImgCache.options.debug = false;
+    ImgCache.options.debug = true;
     ImgCache.options.usePersistentCache = true;
     ImgCache.options.chromeQuota = 100 * 1024 * 1024;
-    //ImgCache.init();
 
-    // load the Leaflet map, with the selected basemap
+    // initialize the Leaflet map
     MAP = new L.Map('map_canvas', {
         attributionControl: true,
         zoomControl: true,
@@ -52,7 +51,6 @@ $(window).load(function () {
     });
 
     // set an event handler on the Leaflet map, so that changing the viewport will trigger the images to be cached and then to load from the cache
-/*
     function cacheVisibleTiles() {
         $('#map_canvas div.leaflet-tile-pane img.leaflet-tile').each(function () {
             var img = $(this);
@@ -65,24 +63,37 @@ $(window).load(function () {
     }
     MAP.on('moveend',cacheVisibleTiles);
     MAP.on('zoomend',cacheVisibleTiles);
-*/
 
-    // set an event handler on all of the BASEMAPS layers, so that a failure to load a tile, will be interpreted as us being offline,
-    // and will cause the tile to be loaded from the cache if possible
+    // set an event handler on all of the BASEMAPS layers
+    // failure to load a tile, will be interpreted as us being offline and will cause the tile to be loaded from the cache if possible
+    for (var i in BASEMAPS) {
+        BASEMAPS[i].on('tileerror', function (e) {
+            ImgCache.useCachedFile( $(e.tile) );
+        });
+    }
+
+    // finally some action! initialize the cache
+    // when that's ready start the map's initial view and start ongoing geolocation
+    setTimeout(function () {
+        ImgCache.init(function () {
+            // set an initial view
+            MAP.setView(LOCATION.getLatLng(),DEFAULT_ZOOM);
+
+            // set up a on-location handler: call onLocationFound() as defined in library.js
+            // then set ongoing location tracking
+            MAP.on('locationfound', onLocationFound);
+            MAP.locate({ enableHighAccuracy:true, watch:true });
+        }  );
+    },3000);
+});
+
+
+
 /*
-    BASEMAPS['terrain'].on('tileerror', function (e) {
-        ImgCache.useCachedFile( $(e.tile) );
-    });
-*/
-
-    // set an initial view
-    MAP.setView(LOCATION.getLatLng(),DEFAULT_ZOOM);
-
-    // set up a on-location handler: call onLocationFound() as defined in library.js
-    // then set ongoing location tracking
-    MAP.on('locationfound', onLocationFound);
-    MAP.locate({ enableHighAccuracy:true, watch:true });
-
+ * On page load
+ * Other startup that doesn't require the Map and Imgcache to be ready
+ */
+$(window).load(function () {
     // enable the basemap picker in the Settings page
     // AND check the currently-selected one
     $('input[type="radio"][name="basemap"]').change(function () {
@@ -113,6 +124,8 @@ $(window).load(function () {
         ImgCache.clearCache();
     });
 });
+
+
 
 
 /*
