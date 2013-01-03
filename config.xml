@@ -59,12 +59,12 @@
         <feature name="http://api.phonegap.com/1.0/notification"/> --> <!-- VIBRATE -->
 
     <!-- IOS STUFF -->
-       <!-- should hyperlinks open within the app's webview or the defaul;t browser? true=app webview, false=browser -->
-       <preference name="stay-in-webview" value="true" />
+        <!-- should hyperlinks open within the app's webview or the default browser? true=app webview, false=browser -->
+        <preference name="stay-in-webview" value="true" />
         <!-- should phone numbers and email addresses automagically become hyperlinks to default actions? (true=yes, false=no) -->
         <preference name="detect-data-types" value="true" />
         <!-- should the app terminate when the home button is pressed or stay running and simply resume? true=terminate, false=stay -->
-        <preference name="exit-on-suspend" value="true" />
+        <preference name="exit-on-suspend" value="false" />
 
     <!-- ANDROID STUFF -->
         <!-- how many milliseconds to show the splashscreen? -->
