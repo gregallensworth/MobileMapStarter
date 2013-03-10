@@ -49,14 +49,14 @@
     -->
         <!-- to use NO permissions, use this and comment the rest. INTERNET permissions is always enabled anyway -->
         <!-- <preference name="permissions" value="none"/> -->
-        <feature name="http://api.phonegap.com/1.0/battery"/><!-- BROADCAST_STICKY -->
-        <feature name="http://api.phonegap.com/1.0/camera"/><!-- CAMERA -->
-        <feature name="http://api.phonegap.com/1.0/contacts"/><!-- READ_CONTACTS WRITE_CONTACTS GET_ACCOUNTS -->
+        <feature name="http://api.phonegap.com/1.0/battery"/> <!-- BROADCAST_STICKY -->
+        <feature name="http://api.phonegap.com/1.0/camera"/> <!-- CAMERA -->
+        <feature name="http://api.phonegap.com/1.0/contacts"/> <!-- READ_CONTACTS WRITE_CONTACTS GET_ACCOUNTS -->
         <feature name="http://api.phonegap.com/1.0/file"/> <!-- WRITE_EXTERNAL_STORAGE -->
         <feature name="http://api.phonegap.com/1.0/geolocation"/> <!-- ACCESS_COARSE_LOCATION ACCESS_FINE_LOCATION ACCESS_LOCATION_EXTRA_COMMANDS -->
         <feature name="http://api.phonegap.com/1.0/media"/> <!-- RECORD_AUDIO RECORD_VIDEO MODIFY_AUDIO_SETTINGS -->
         <feature name="http://api.phonegap.com/1.0/network"/> <!-- ACCESS_NETWORK_STATE -->
-        <feature name="http://api.phonegap.com/1.0/notification"/> --> <!-- VIBRATE -->
+        <feature name="http://api.phonegap.com/1.0/notification"/> <!-- VIBRATE -->
 
     <!-- IOS STUFF -->
         <!-- should hyperlinks open within the app's webview or the default browser? true=app webview, false=browser -->

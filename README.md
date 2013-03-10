@@ -16,22 +16,26 @@ Components of this app:
 
 * Leaflet -- Quick, pretty, easy tiled maps.
 
-* imgcache.js -- Cache Leaflet tiles to device storage, for offline use.
+* File API and L.TileLayer caching system -- Cache Leaflet tiles to device storage for offline use.
 
 
 COMPILING IT / TESTING IT
 ================
 
-This ready-to-run app is designed for use with Phonegap/Cordova, particularly Phonegap Build. Using Eclipse or XCode may have different results. If you run into issues trying to compile it yourself on XCode or Eclipse, let me know and I'll see what I can do.
+This ready-to-run app is designed for use with Phonegap/Cordova, particularly Phonegap Build. Simply upload to Phonegap Build and you'll get back a working phone app.
 
-The basic app will work in Google Chrome, if you enable file access:
-    chrome.exe --allow-file-access-from-files --allow-file-access
+Using Eclipse or XCode may have different results. If you run into issues trying to compile it yourself on XCode or Eclipse, let me know and I'll see what I can do.
+
+The HTML/JS will work in Google Chrome, if you enable file access:
+    chrome.exe --allow-file-access
+I don't recommend developing using file:// URLs, as the File API is still buggy even if you give the --allow-file-access-from-files flag. Instead, install a webserver on your machine and use http://localhost/ URLs.
+
 
 
 WALKTHROUGH: EXPLAINING THE CODE & CUSTOMIZING YOUR APP
 ================
 
-Start with config.js This is basic settings such as default lat/lng/zoom and your Bing API key.
+Start with index.js This includes basic settings such as default lat/lng/zoom and your Bing API key.
 
 Check out config.xml to start personalizing your app: the name, author attribution, permissions, and so on.
 

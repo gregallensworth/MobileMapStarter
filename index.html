@@ -10,19 +10,28 @@
     <script type="text/javascript" src="libs/jquery.mobile-1.2.0/jquery.mobile.js"></script>
     <link rel="stylesheet" type="text/css" href="libs/jquery.mobile-1.2.0/jquery.mobile.css" />
 
-    <!-- The image caching system -->
-    <script type="text/javascript" src="libs/imgcache.js"></script>
-
     <!-- Leaflet et al -->
     <link rel="stylesheet" type="text/css" href="libs/leaflet-0.4.5/leaflet.css" />
     <script type="text/javascript" src="libs/leaflet-0.4.5/leaflet-src.js"></script>
+    <!--
     <script type="text/javascript" src="libs/leaflet-bing.js"></script>
+    -->
 
-    <!-- our own custom stuff -->
+    <!-- a caching system for Leaflet L.TileLayer -->
+    <script type="text/javascript" src="libs/cache.js"></script>
+
+    <!-- weinre debugging for development; replace with your own IP address and your own weinre server -->
+    <!--
+    <script src="http://192.168.1.107:8080/target/target-script-min.js#mobilemapstarter"></script>
+    -->
+
+    <!-- our own custom stuff. on device ready, the init() function in index.js will be called to start up everything -->
     <link rel="stylesheet" type="text/css" href="index.css" />
-    <script type="text/javascript" src="config.js"></script>
     <script type="text/javascript" src="index.js"></script>
     <script type="text/javascript" src="library.js"></script>
+    <script type="text/javascript">
+        document.addEventListener("deviceready", init, false);
+    </script>
 </head>
 <body>
 
@@ -51,8 +60,8 @@
         <h1>Base Map</h1>
         <div data-role="controlgroup">
         <label><input type="radio" name="basemap" value="terrain" checked="true" /> Terrain</label>
-        <label><input type="radio" name="basemap" value="plain" /> Plain</label>
-        <label><input type="radio" name="basemap" value="bingaerial" /> Bing Aerial</label>
+        <label><input type="radio" name="basemap" value="photo" /> Satellite</label>
+        <label><input type="checkbox" id="basemap_offline_checkbox" value="1" /> Offline, use cached map data</label>
         </div>
 
         <h1>Features</h1>
@@ -63,7 +72,8 @@
 
         <h1>Cache</h1>
         <div data-role="controlgroup">
-            <a href="#page-clearcache" data-role="button">Clear map cache</a>
+            <a href="#page-seedcache" data-role="button" data-rel="dialog">Download map tiles</a>
+            <a href="#page-cachestatus" data-role="button" data-rel="dialog">Storage Usage</a>
         </div>
 
     </div>
@@ -73,20 +83,53 @@
 <div data-role="page" id="page-map">
     <div data-role="content" id="map_canvas"></div>
     <a href="#page-settings" class="leaflet-control-settings"><img src="img/settings.png" /></a>
+
+<div id="geocoder">
+    <img id="geocoder_button" src="img/search.png" /> <input type="text" id="geocoder_text" placeholder="Search ..." />
+</div>
+
 </div>
 
 
 
-<div data-role="page" id="page-clearcache">
+<div data-role="page" id="page-seedcache">
     <div data-role="header" data-position="inline">
-	<h1>Clear Tiles?</h1>
+    <h1>Download Tiles?</h1>
     </div>
 
     <div data-role="content">
-        <p>This will delete the map cache. You will not be able to use the map while offline, until you go online and browse to re-cache the map.</p>
-	    <a href="javascript:void(0);" name="clearcache" data-role="button" data-rel="back" data-theme="b">Clear cache</a>
-	    <a href="#page-settings" data-role="button" data-rel="back">Cancel</a>
-	</div>
+        <p>This will download map tiles within the current map view, so you can use the map without Internet access. This will take a while.</p>
+        <a href="javascript:void(0);" name="seedcache" data-role="button" data-rel="back" data-theme="b">Download</a>
+        <a href="#page-settings" data-role="button" data-rel="back">Cancel</a>
+    </div>
+</div>
+
+
+<div data-role="page" id="page-cachestatus">
+    <div data-role="header" data-position="inline">
+    <h1>Cache Storage</h1>
+    </div>
+
+
+    <div data-role="content">
+        <input type="text" id="cachestatus_storage" value="Calculating" readonly="readonly" style="text-align:center;" />
+        <input type="text" id="cachestatus_files" value="Calculating" readonly="readonly" style="text-align:center;" />
+        <a href="#page-clearcache" data-role="button" data-rel="dialog">Clear map tiles</a>
+        <a href="#page-settings" data-role="button" data-rel="back">Back</a>
+    </div>
+</div>
+
+
+<div data-role="page" id="page-clearcache">
+    <div data-role="header" data-position="inline">
+    <h1>Clear Tiles?</h1>
+    </div>
+
+    <div data-role="content">
+        <p>This will delete the downloaded map tiles. You will not be able to use the map when offline, until you go online and browse to re-cache the map.</p>
+        <a href="javascript:void(0);" name="clearcache" data-role="button" data-rel="back" data-theme="b">Clear cache</a>
+        <a href="#page-cachestatus" data-role="button" data-rel="back">Cancel</a>
+    </div>
     </div>
 </div>
 

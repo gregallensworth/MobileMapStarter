@@ -3,10 +3,31 @@
  * This is where you will start adding your own code, adding event handlers, etc.
  *
  * The app is based on jQuery Mobile, so constructs like $('#id') and $.get() are entirely usable here.
+ * But it's also designed for operating properly in Chrome for prototyping, so .click() is used instead of .tap()
  */
 
-// the Map object
-var MAP;
+// the Map object, default center and zoom settings
+var MAP, CACHE;
+var DEFAULT_LAT =   44.5875;
+var DEFAULT_LNG = -123.1712;
+var DEFAULT_ZOOM = 15;
+var MIN_ZOOM = 10;
+var MAX_ZOOM = 16;
+
+// PLEASE USE YOUR OWN Mapbox layers if you use them
+// the "name" attribute is REQUIRED. it's not Leaflet standard, but is used by the cache system.
+var BASEMAPS = {};
+BASEMAPS['terrain'] = new L.TileLayer("http://{s}.tiles.mapbox.com/v3/greeninfo.map-fdff5ykx/{z}/{x}/{y}.jpg", { name:'Terrain', subdomains:['a','b','c','d'] });
+BASEMAPS['photo']   = new L.TileLayer("http://{s}.tiles.mapbox.com/v3/greeninfo.map-zudfckcw/{z}/{x}/{y}.jpg", { name:'Photo', subdomains:['a','b','c','d'] });
+//BASEMAPS['plain']   = new L.TileLayer("http://{s}.tiles.mapbox.com/v3/greeninfo.map-8ljrd2bt/{z}/{x}/{y}.jpg", { name:'Streets', subdomains:['a','b','c','d'] });
+
+// PLEASE USE YOUR OWN Bing API key
+// used primarily by the geocoder
+var BING_API_KEY = "AjBuYw8goYn_CWiqk65Rbf_Cm-j1QFPH-gGfOxjBipxuEB2N3n9yACKu5s8Dl18N";
+
+// the name of a subdirectory where this app will store its content
+// this is particularly important on Android where filesystem is not a sandbox but your SD card
+var STORAGE_SUBDIR = "MobileMapStarter";
 
 // a Marker indicating our last-known geolocation, and a Circle indicating accuracy
 // Our present latlng can be had from LOCATION..getLatLng(), a useful thing for doing distance calculations
@@ -23,23 +44,61 @@ var ACCURACY  = new L.Circle(new L.LatLng(DEFAULT_LAT,DEFAULT_LNG), 1);
 // You can set this flag anywhere, but if there's also a checkbox toggle (there is) then also update it or else you'll confuse the user with a checkbox that's wrong
 var AUTO_RECENTER = true;
 
+/***************************************************************************************************/
 
 /*
- * On page load
- * pre-render the page divs (lazy loading doesn't help much here)
- * start the Leaflet map
- * Set up event handlers when our location changes
+ * Orientation change event handler
+ * Detect whether the #map_canvas is showing, and if so trigger a resize
+ * Leaflet needs this so it can correct its display, e.g. when changing pages within the app
  */
-$(window).load(function () {
+function resizeMapIfVisible() {
+    if ( MAP && $('#map_canvas').is(':visible') ) {
+        $('#map_canvas').height( $(window).height() );
+        $('#map_canvas').width( $(window).width() );
+        MAP.invalidateSize();
+    }
+}
+$(window).bind('orientationchange pageshow resize', resizeMapIfVisible);
+
+
+/*
+ * The master init() function, called on deviceready
+ * It's suggested that all other init be started from here
+ * 
+ * Pre-render the page divs (lazy loading doesn't help much here)
+ * Start the caching system and then the Leaflet map
+ * Then onward to other setup and handlers,. e.g. checkboxe,s geocoder text boxes, ...
+ */
+function init() {
     // pre-render the pages so we don't have that damnable lazy rendering thing messing with it
     $('div[data-role="page"]').page();
 
-    // initialize the tile caching
-    ImgCache.options.debug = false;
-    ImgCache.options.usePersistentCache = true;
-    ImgCache.options.chromeQuota = 100 * 1024 * 1024;
+    // start up the filesystem and then the map
+    initCacheThenMap();
 
-    // initialize the Leaflet map
+    // set up buttons, dialogs, etc.
+    initSettings();
+    initGeocoder();
+}
+
+
+
+function initCacheThenMap() {
+    // initialize the filesystem where we store cached tiles. when this is ready, proceed with the map
+    CACHE = new OfflineTileCacher(STORAGE_SUBDIR);
+    CACHE.init(function () {
+        CACHE.registerLayer(BASEMAPS['terrain']);
+        CACHE.registerLayer(BASEMAPS['photo']);
+        initMap();
+        resizeMapIfVisible();
+    }, function () {
+        alert('Could not load the local filesystem. Exiting.');
+        return;
+    });
+}
+
+function initMap() {
+    // load the map and its initial view
     MAP = new L.Map('map_canvas', {
         attributionControl: true,
         zoomControl: true,
@@ -50,41 +109,11 @@ $(window).load(function () {
         layers : [ BASEMAPS['terrain'], ACCURACY, LOCATION ]
     });
 
-    // set an event handler on the Leaflet map, so that changing the viewport will trigger the images to be cached and then to load from the cache
-    function cacheVisibleTiles() {
-        $('#map_canvas div.leaflet-tile-pane img.leaflet-tile').each(function () {
-            var img = $(this);
-            var src = img.attr('src');
-            if (src.indexOf('http') == -1) return; // not loading via HTTP, already cached?
-            ImgCache.cacheFile(src, function () {
-                ImgCache.useCachedFile(img);
-            });
-        });
-    }
-    MAP.on('moveend',cacheVisibleTiles);
-    MAP.on('zoomend',cacheVisibleTiles);
+    MAP.setView(LOCATION.getLatLng(),DEFAULT_ZOOM);
 
-    // set an event handler on all of the BASEMAPS layers
-    // failure to load a tile, will be interpreted as us being offline and will cause the tile to be loaded from the cache if possible
-    for (var i in BASEMAPS) {
-        BASEMAPS[i].on('tileerror', function (e) {
-            ImgCache.useCachedFile( $(e.tile) );
-        });
-    }
-
-    // finally some action! initialize the cache
-    // when that's ready start the map's initial view and start ongoing geolocation
-    setTimeout(function () {
-        ImgCache.init(function () {
-            // set an initial view
-            MAP.setView(LOCATION.getLatLng(),DEFAULT_ZOOM);
-
-            // set up a on-location handler: call onLocationFound() as defined in library.js
-            // then set ongoing location tracking
-            MAP.on('locationfound', onLocationFound);
-            MAP.locate({ enableHighAccuracy:true, watch:true });
-        }  );
-    },3000);
+    // set up the event handler when our location is detected, and start continuous tracking
+    MAP.on('locationfound', onLocationFound);
+    MAP.locate({ enableHighAccuracy:true, watch:true });
 
     // Leaflet behavior patch: on a zoomend event, check whether we're at MIN_ZOOM or MAX_ZOOM and show/hide the +/- buttons in the Zoom control
     MAP.on('zoomend', function () {
@@ -92,15 +121,11 @@ $(window).load(function () {
         z <= MIN_ZOOM ? $('.leaflet-control-zoom-out').hide() : $('.leaflet-control-zoom-out').show();
         z >= MAX_ZOOM ? $('.leaflet-control-zoom-in').hide() : $('.leaflet-control-zoom-in').show();
     });
-});
+}
 
 
 
-/*
- * On page load
- * Other startup that doesn't require the Map and Imgcache to be ready
- */
-$(window).load(function () {
+function initSettings() {
     // enable the basemap picker in the Settings page
     // AND check the currently-selected one
     $('input[type="radio"][name="basemap"]').change(function () {
@@ -126,27 +151,109 @@ $(window).load(function () {
         $.mobile.changePage('#page-map')
     });
 
-    // enable the Clear Cache button in Settings, to clear the Imgcache
+    // enable the Clear Cache and Seed Cache buttons in Settings, and set up the progress bar
     $('#page-clearcache a[name="clearcache"]').click(function () {
-        ImgCache.clearCache();
+        $.mobile.showPageLoadingMsg("a", "Clearing cache");
+        CACHE.clearCache(function () {
+            // on successful deletion, repopulate the disk usage boxes with what we know is 0
+            $('#cachestatus_files').val('0 map tiles');
+            $('#cachestatus_storage').val('0 MB');
+
+            $.mobile.changePage("#page-cachestatus");
+            $.mobile.hidePageLoadingMsg();
+        });
+        return false;
     });
-});
+    $('#page-seedcache a[name="seedcache"]').click(function () {
+        // the lon, lat, and zooms for seeding
+        var lon   = MAP.getCenter().lng;
+        var lat   = MAP.getCenter().lat;
+        var zmin  = MAP.getZoom();
+        var zmax  = MAX_ZOOM;
+
+        // fetch the assocarray of layername->layerobj from the Cache provider,
+        // then figure out a list of the layernames too so we can seed them sequentially
+        var layers_to_seed = CACHE.registeredLayers();
+        var layernames = [];
+        for (var l in layers_to_seed) layernames[layernames.length] = layers_to_seed[l].options.name;
+        var last_layer_name = layernames[layernames.length-1];
+
+        function seedLayerByIndex(index) {
+            if (index >= layernames.length) {
+                // past the end, we're done
+                $.mobile.changePage("#page-settings");
+                return;
+            }
+            var layername = layernames[index];
+
+            var layer_complete = function(done,total) {
+                // hide the spinner
+                $.mobile.hidePageLoadingMsg();
+                // go on to the next layer
+                seedLayerByIndex(index+1);
+            }
+            var progress = function(done,total) {
+                // show or update the spinner
+                var percent = Math.round( 100 * parseFloat(done) / parseFloat(total) );
+                var text = layername + ': ' + done + '/' + total + ' ' + percent + '%';
+                $.mobile.showPageLoadingMsg("a", text, true);
+
+                // if we're now done, call the completion function to close the spinner
+                if (done>=total) layer_complete();
+            };
+            var error = function() {
+                alert('Download error!');
+            }
+
+            CACHE.seedCache(layername,lat,lon,zmin,zmax,progress,error);
+        }
+
+        // start it off!
+        seedLayerByIndex(0);
+
+        // cancel the button taking us back to the same page; that will happen in the progress() and error() handlers
+        return false;
+    });
+
+    // enable the "Offline" checkbox to toggle all registered layers between offline & online mode
+    $('#basemap_offline_checkbox').change(function () {
+        var offline = $(this).is(':checked');
+        var layers  = CACHE.registeredLayers();
+        if (offline) {
+            for (var layername in layers) CACHE.useLayerOffline(layername);
+        } else {
+            for (var layername in layers) CACHE.useLayerOnline(layername);
+        }
+    });
+
+    // enable the "Cache Status" checkbox to calculate the disk usage and write to to the dialog
+    // allow the change to the dialog, and start the asynchronous disk usage calculation
+    $('#page-settings a[href="#page-cachestatus"]').click(function () {
+        $('#cachestatus_files').val('Calculating');
+        $('#cachestatus_storage').val('Calculating');
+
+        CACHE.getDiskUsage(function (filecount,totalbytes) {
+            var megabytes = (totalbytes / 1048576).toFixed(1);
+            $('#cachestatus_files').val(filecount + ' ' + 'map tiles');
+            $('#cachestatus_storage').val(megabytes + ' ' + 'MB');
+        });
+    });
+}
 
 
 
+function initGeocoder() {
+    $('#geocoder_button').click(function () {
+        var address = $('#geocoder_text').val();
+        if (! address) return;
+        geocodeAndZoom(address);
+    });
+    $('#geocoder_text').keydown(function (key) {
+        if(key.keyCode == 13) $('#geocoder_button').click();
+    });
+}
 
-/*
- * Orientation change event handler
- * Detect whether the #map_canvas is showing, and if so trigger a resize
- * Leaflet needs this so it can correct its display, e.g. when changing pages within the app
- */
-$(window).bind('orientationchange pageshow resize', function() {
-    if ( MAP && $('#map_canvas').is(':visible') ) {
-        $('#map_canvas').height( $(window).height() );
-        $('#map_canvas').width( $(window).width() );
-        MAP.invalidateSize();
-    }
-});
+
 
 
 
