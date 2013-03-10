@@ -30,7 +30,11 @@
     <script type="text/javascript" src="index.js"></script>
     <script type="text/javascript" src="library.js"></script>
     <script type="text/javascript">
+    if ( is_cordova() ) {
         document.addEventListener("deviceready", init, false);
+    } else {
+        $(document).ready(init);
+    }
     </script>
 </head>
 <body>
