@@ -167,8 +167,7 @@ var OfflineTileCacher = function(directoryname) {
             tilelayer._url_offline = CACHE.TILEDIRECTORY.fullPath + '/' + filename;
         } else {
             var urlparts = parseURL(document.location.href);
-            dir = urlparts.protocol + '://' + urlparts.host + '/persistent/';
-            tilelayer._url_offline = 'filesystem:' + dir + filename;
+            tilelayer._url_offline = 'filesystem:' + urlparts.protocol + '://' + urlparts.host + '/persistent/' + myself.subdirname + '/' + myself.tiledirname + '/' + filename;
         }
 
         // done adding the two URL versions; log it to our registry
@@ -368,8 +367,7 @@ var OfflineTileCacher = function(directoryname) {
 
                     // make up the filename, a flat list of files under the tiles/ directory
                     // account for Chrome adding a trailing / and Cordova not doing so
-                    var sep = is_cordova() ? '/' : '';
-                    var filename = myself.TILEDIRECTORY.fullPath + sep + [layername,z,x,y].join('-') + '.png';
+                    var filename = myself.TILEDIRECTORY.fullPath + '/' + [layername,z,x,y].join('-') + '.png';
                     //console.log(filename);
 
                     // add it to the list
