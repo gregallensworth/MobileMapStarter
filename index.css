@@ -14,6 +14,14 @@ h1 {
 
 
 
+/*** PhoneGap Patches ***/
+
+a[data-role="button"] {
+    text-decoration:none;
+}
+
+
+
 /*** FOR THE MAP PAGE ***/
 
 /* lie about the width & height just so the map can initialize, resizeMapIfVisible() fixes this later */
