@@ -136,8 +136,10 @@ function geocodeAndZoom(address) {
 
         // change to the map and center on the suggested bounds
         $.mobile.changePage('#page-map');
-        var bbox = new L.LatLngBounds(new L.LatLng(results[0].bbox[0],results[0].bbox[1]),new L.LatLng(results[0].bbox[2],results[0].bbox[3]));
-        MAP.fitBounds(bbox);
+        setTimeout(function () {
+            var bbox = new L.LatLngBounds(new L.LatLng(results[0].bbox[0],results[0].bbox[1]),new L.LatLng(results[0].bbox[2],results[0].bbox[3]));
+            MAP.fitBounds(bbox);
+        }, 500);
     }
     function failure() {
         navigator.notification.alert('Could not find that address. Please try again.');

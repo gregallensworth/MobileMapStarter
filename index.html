@@ -1,28 +1,26 @@
+<!DOCTYPE html>
 <html>
 <head>
+    <!-- the phonegap.js stub is helpful for Phonegap Build to enable plugins and features. There is no phonegap.js -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
     <title>MobileMapStarter</title>
-
-    <!-- this stub is helpful for Phonegap Build to enable plugins and features. There is no phonegap.js -->
     <script src="phonegap.js"></script>
 
     <!-- jQuery and JQ Mobile -->
-    <script type="text/javascript" src="libs/jquery-1.8.3.js"></script>
-    <script type="text/javascript" src="libs/jquery.mobile-1.2.0/jquery.mobile.js"></script>
-    <link rel="stylesheet" type="text/css" href="libs/jquery.mobile-1.2.0/jquery.mobile.css" />
+    <script type="text/javascript" src="libs/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="libs/jquery.mobile-1.4.0/jquery.mobile-1.4.0.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="libs/jquery.mobile-1.4.0/jquery.mobile-1.4.0.css" />
 
     <!-- Leaflet et al -->
-    <link rel="stylesheet" type="text/css" href="libs/leaflet-0.4.5/leaflet.css" />
-    <script type="text/javascript" src="libs/leaflet-0.4.5/leaflet-src.js"></script>
-    <!--
-    <script type="text/javascript" src="libs/leaflet-bing.js"></script>
-    -->
+    <link rel="stylesheet" type="text/css" href="libs/leaflet-0.7.2/leaflet.css" />
+    <script type="text/javascript" src="libs/leaflet-0.7.2/leaflet-src.js"></script>
 
     <!-- a caching system for Leaflet L.TileLayer -->
     <script type="text/javascript" src="libs/cache.js"></script>
 
     <!-- weinre debugging for development; replace with your own IP address and your own weinre server -->
     <!--
-    <script src="http://192.168.1.107:8080/target/target-script-min.js#mobilemapstarter"></script>
+    <script src="http://weinre.greeninfo.org:8080/target/target-script-min.js#mobilemapstarter"></script>
     -->
 
     <!-- our own custom stuff. on device ready, the init() function in index.js will be called to start up everything -->
@@ -55,7 +53,7 @@
 
 <div data-role="page" id="page-settings">
     <div data-role="header">
-        <a href="#page-map" data-icon="home" data-role="button">OK</a>
+        <a href="#page-map" data-icon="home" data-role="button">Back</a>
         <h1>Settings</h1>
     </div>
     <div data-role="content">
@@ -85,15 +83,31 @@
 
 
 <div data-role="page" id="page-map">
-    <div data-role="content" id="map_canvas"></div>
-    <a href="#page-settings" class="leaflet-control-settings"><img src="img/settings.png" /></a>
+    <div data-role="header">
+        <a href="#page-settings" data-icon="gear" data-role="button">Settings</a>
+        <h1>Map</h1>
+        <a href="#page-search" data-icon="search" data-role="button">Search</a>
+    </div>
+    <div data-role="content">
 
-<div id="geocoder">
-    <img id="geocoder_button" src="img/search.png" /> <input type="text" id="geocoder_text" placeholder="Search ..." />
+        <div id="map_canvas"></div>
+
+    </div>
 </div>
 
-</div>
 
+<div data-role="page" id="page-search">
+    <div data-role="header">
+        <a href="#page-settings" data-icon="home" data-role="button">Back</a>
+        <h1>Search</h1>
+    </div>
+    <div data-role="content">
+
+    <input type="text" id="geocoder_text" placeholder="City or address" />
+    <a href="javascript:void(0);" id="geocoder_button" data-role="button" data-theme="b">Search</a>
+
+    </div>
+</div>
 
 
 <div data-role="page" id="page-seedcache">

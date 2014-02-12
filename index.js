@@ -52,13 +52,22 @@ var AUTO_RECENTER = true;
  * Leaflet needs this so it can correct its display, e.g. when changing pages within the app
  */
 function resizeMapIfVisible() {
-    if ( MAP && $('#map_canvas').is(':visible') ) {
-        $('#map_canvas').height( $(window).height() );
-        $('#map_canvas').width( $(window).width() );
-        MAP.invalidateSize();
+    if (!  $("#map_canvas").is(':visible') ) return;
+
+    var page    = $(":jqmData(role='page'):visible");
+    var header  = $(":jqmData(role='header'):visible");
+    var content = $(":jqmData(role='content'):visible");
+    var viewportHeight = $(window).height();
+    var contentHeight = viewportHeight - header.outerHeight();
+    page.height(contentHeight + 1);
+    $(":jqmData(role='content')").first().height(contentHeight);
+
+    if ( $("#map_canvas").is(':visible') ) {
+        $("#map_canvas").height(contentHeight);
+        if (MAP) MAP.invalidateSize();
     }
 }
-$(window).bind('orientationchange pageshow resize', resizeMapIfVisible);
+$(window).bind('orientationchange pageshow pagechange resize', resizeMapIfVisible);
 
 
 /*
@@ -108,8 +117,11 @@ function initMap() {
         minZoom: MIN_ZOOM, maxZoom: MAX_ZOOM,
         layers : [ BASEMAPS['terrain'], ACCURACY, LOCATION ]
     });
-
     MAP.setView(LOCATION.getLatLng(),DEFAULT_ZOOM);
+
+    // move the geocoder and Settings button to inside the map_canvas, as it's more responsive to size changes that way
+    $('.leaflet-control-settings').appendTo( $('#map_canvas') );
+    $('#geocoder').appendTo( $('#map_canvas') );
 
     // set up the event handler when our location is detected, and start continuous tracking
     MAP.on('locationfound', onLocationFound);
@@ -130,8 +142,8 @@ function initSettings() {
     // AND check the currently-selected one
     $('input[type="radio"][name="basemap"]').change(function () {
         var layername = $(this).val();
-        selectBasemap(layername);
         $.mobile.changePage('#page-map');
+        selectBasemap(layername);
     });
 
     // enable the various "features" checkboxes
@@ -153,14 +165,14 @@ function initSettings() {
 
     // enable the Clear Cache and Seed Cache buttons in Settings, and set up the progress bar
     $('#page-clearcache a[name="clearcache"]').click(function () {
-        $.mobile.showPageLoadingMsg("a", "Clearing cache");
+        $.mobile.loading('show', {theme:"a", text:"Clearing cache", textonly:false, textVisible: true});
         CACHE.clearCache(function () {
             // on successful deletion, repopulate the disk usage boxes with what we know is 0
             $('#cachestatus_files').val('0 map tiles');
             $('#cachestatus_storage').val('0 MB');
 
             $.mobile.changePage("#page-cachestatus");
-            $.mobile.hidePageLoadingMsg();
+            $.mobile.loading('hide');
         });
         return false;
     });
@@ -188,7 +200,7 @@ function initSettings() {
 
             var layer_complete = function(done,total) {
                 // hide the spinner
-                $.mobile.hidePageLoadingMsg();
+                $.mobile.loading('hide');
                 // go on to the next layer
                 seedLayerByIndex(index+1);
             }
@@ -196,8 +208,7 @@ function initSettings() {
                 // show or update the spinner
                 var percent = Math.round( 100 * parseFloat(done) / parseFloat(total) );
                 var text = layername + ': ' + done + '/' + total + ' ' + percent + '%';
-                $.mobile.showPageLoadingMsg("a", text, true);
-
+                $.mobile.loading('show', {theme:"a", text:text, textonly:false, textVisible: true});
                 // if we're now done, call the completion function to close the spinner
                 if (done>=total) layer_complete();
             };

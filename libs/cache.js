@@ -93,21 +93,27 @@ var OfflineTileCacher = function(directoryname) {
             window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, filesystem_ok, filesystem_fail);
         } else {
             // Webkit, request a quota approval THEN move on to requesting a filesystem
-            window.requestFileSystem  = window.requestFileSystem || window.webkitRequestFileSystem;
-            window.storageInfo = window.storageInfo || window.webkitStorageInfo;
-            if (!window.storageInfo) {
+            // Chrome deprecated window.webkitStorageInfo so now we use navigator.webkitPersistentStorage which is slightly different
+            if ( is_cordova() ) {
+                // Cordova/Phonegap
+                window.storageInfo.requestQuota(
+                    1000*1024*1024, // quota is required, so give a 1000 MB quota
+                    function() { window.requestFileSystem(window.storageInfo.PERSISTENT, quota, filesystem_ok, filesystem_fail);  },
+                    function(error) { alert('Failed to request quota: ' + error.code); if (failure) failure(); }
+                );
+            } else if (window.webkitRequestFileSystem) {
+                // Chrome
+                navigator.webkitPersistentStorage.requestQuota(
+                    1000*1024*1024, // quota is required in Webkit, so give a 1000 MB quota
+                    function(granted_bytes) { window.webkitRequestFileSystem(window.PERSISTENT, granted_bytes, filesystem_ok, filesystem_fail);  },
+                    function(error) { alert('Failed to request quota: ' + error.code); if (failure) failure(); }
+                );
+            } else {
+                // something else, and not something we support: make a message then call the failure callback
                 alert('Your device does not support the HTML5 File API.');
                 if (failure) failure();
                 return;
             }
-
-            var quota = 1000*1024*1024; // 1000 MB quota for testing in Webkit
-            window.storageInfo.requestQuota(
-                window.storageInfo.PERSISTENT, 
-                quota,
-                function() { window.requestFileSystem(window.storageInfo.PERSISTENT, quota, filesystem_ok, filesystem_fail);  },
-                function(error) { alert('Failed to request quota: ' + error.code); if (failure) failure(); }
-            );
         }
 
         // INIT PART 2: define FileTransfer as either the FileTransfer function (Cordova) or else a XHR wrapper (Chrome)
@@ -166,8 +172,13 @@ var OfflineTileCacher = function(directoryname) {
         if (is_cordova() ) {
             tilelayer._url_offline = CACHE.TILEDIRECTORY.fullPath + '/' + filename;
         } else {
+            // Chrome: filesystem:http://HOST/persistent/APPNAME/filename
             var urlparts = parseURL(document.location.href);
-            tilelayer._url_offline = 'filesystem:' + urlparts.protocol + '://' + urlparts.host + '/persistent/' + myself.subdirname + '/' + myself.tiledirname + '/' + filename;
+            var host     = urlparts.host;
+            var proto    = urlparts.protocol;
+            var dirname  = urlparts.path.replace(/\/$/,'').split('/')
+                dirname  = dirname[ dirname.length-1 ];
+            tilelayer._url_offline = 'filesystem:' + proto + '://' + host + '/persistent/' + dirname + '/' + this.tiledirname + '/' + filename;
         }
 
         // done adding the two URL versions; log it to our registry
@@ -365,8 +376,6 @@ var OfflineTileCacher = function(directoryname) {
                     }
                     //console.log(url);
 
-                    // make up the filename, a flat list of files under the tiles/ directory
-                    // account for Chrome adding a trailing / and Cordova not doing so
                     var filename = myself.TILEDIRECTORY.fullPath + '/' + [layername,z,x,y].join('-') + '.png';
                     //console.log(filename);
 
