@@ -148,3 +148,32 @@ function geocodeAndZoom(address) {
     geocode(address,success,failure);    
 }
 
+
+
+/*
+ * This provides a dialog panel for showing an error message, which has
+ * some benefits over using alert() to report errors or acknowledgements.
+ * First, it is more mobile-esque and less canned than alert()
+ * Second, it does not block JavaScript processing. Sometimes you do want to block, but often not.
+ */
+/*
+ * The target dialog is as follows. Place it into your HTML.
+ * You can then use alertdialog(message) same as alert()
+
+<div data-role="dialog" id="dialog-error">
+    <div data-role="header">
+        <h1></h1>
+    </div>
+    <div data-role="content">
+    </div>
+</div>
+*/
+
+
+function mobilealert(message,header) {
+    if (typeof header == 'undefined') header = 'Error';
+
+    $('#dialog-error div[data-role="content"]').text(message);
+    $('#dialog-error div[data-role="header"] h1').text(header);
+    $.mobile.changePage('#dialog-error');
+}
