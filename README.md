@@ -5,6 +5,7 @@ A starting framework for mobile maps using Cordova/Phonegap.
 A minimal but functional, standalone mobile app from which to build your own creations.
 
 This app is designed for Phonegap/Cordova, therefore it is HTML, JavaScript, and CSS.
+This consists of ONLY the HTML/CSS/JS components, and not the working Cordova libraries and binaries, the Xcode project files, and so on.
 
 Components of this app:
 
@@ -26,7 +27,7 @@ This ready-to-run app is designed for use with Phonegap/Cordova, particularly Ph
 
 Simply upload to Phonegap Build and you'll get back a working phone app.
 
-Tip: I myself don't use Phonegap Build due to some issues. Most notably, Android apps are not set to singleTask mode, meaning that when the user taps the icon and the app is already running, a new instance is started without the prior state, selections, etc. I prefer to compile using the Cordova command-line tools and Xcode.
+Tip: I myself don't use Phonegap Build due to some issues. Most notably, Android apps are not set to singleTask mode, meaning that when the user taps the icon and the app is already running, a new instance is started without the prior state, selections, etc. Additionally, you can't set more advanced settings such as hiding the taskbar in iOS, using plugins beyond the few supported by Build, and so on.
 
 
 COMPILING IT - Xcode and Eclipse
@@ -42,7 +43,22 @@ Second, follow the usual steps for creating a Cordova project:
     cordova platform add android
     cordova platform add ios
 
-Lastly, replace the content of _www_ with the MobileMapStarter HTML/JS/CSS payload, and you should be ready to emulate and build:
+Add some required plugins:
+    cordova plugins add org.apache.cordova.file
+    cordova plugins add org.apache.cordova.file-transfer
+    cordova plugins add org.apache.cordova.geolocation
+    cordova plugins add org.apache.cordova.network-information
+    cordova plugins add org.apache.cordova.device
+
+Replace the content of _www_ with the MobileMapStarter HTML/JS/CSS payload.
+
+And a small edit to index.html
+    Look for this tag:
+        <script src="phonegap.js"></script>
+    And rename it to Cordova *if* you're using Cordova instead of Phonegap:
+        <script src="cordova.js"></script>
+
+You should be ready to emulate and build:
     cordova prepare android
     cordova run android
     cordova build android --release
