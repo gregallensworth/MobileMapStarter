@@ -73,8 +73,12 @@ var OfflineTileCacher = function(directoryname) {
                 // store the reference to our own directory
                 myself.DIRECTORY = subdir;
                 // create a subdir for tiles
+                // if iOS then also set the metadata flag so it won't get backed up, per store policy
                 subdir.getDirectory('tiles', {create:true, exclusive:false}, function (tilesubdir) {
                     myself.TILEDIRECTORY = tilesubdir;
+                    if (is_ios()) {
+                        tilesubdir.setMetadata(null, null, { "com.apple.MobileBackup":1});
+                    }
                     if (success) success();
                 }, function (error) {
                     alert("Unable to create tile subdirectory\n" + error.code);
@@ -312,6 +316,10 @@ var OfflineTileCacher = function(directoryname) {
             //console.log(['not in cache',filename_exists]);
             myself.FileTransfer.download(urls[index].url, urls[index].filename,
                 function(file) {
+                    // if iOS then set the metadata flag so it won't get backed up, per store policy
+                    if (is_ios()) {
+                        file.setMetadata(null, null, { "com.apple.MobileBackup":1});
+                    }
                     if (progress) progress(index+1,urls.length);
                     myself.downloadFile(urls,index+1,progress);
                 },
