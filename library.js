@@ -6,11 +6,28 @@
 
 /*
  * Return true/false indicating whether we're running under Cordova/Phonegap
+ * as well as specifically which platform
+ * and other device-specific querying
  */
 function is_cordova() {
     return (typeof(cordova) !== 'undefined' || typeof(phonegap) !== 'undefined');
 };
-
+function is_android() {
+    if (! is_cordova() ) return false;
+    return device.platform == 'Android';
+}
+function is_ios() {
+    if (! is_cordova() ) return false;
+    return device.platform == 'iOS';
+}
+function has_internet() {
+    // NOTE: this requires permissions, see the Cordova docs for "connection"
+    if ( is_cordova() ) {
+        return navigator.connection.type != Connection.NONE;
+    } else {
+        return true;
+    }
+}
 
 
 /*
