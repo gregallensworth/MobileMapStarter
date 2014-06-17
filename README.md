@@ -63,9 +63,7 @@ Replace the content of _www_ with the MobileMapStarter HTML/JS/CSS payload.
 
 And a small edit to index.html
 
-Look for this tag:
-
-> <script src="phonegap.js"></script>
+If you're using Cordova instead of Phonegap, look in _index.html_  for the _<script>_ tag for _phonegap.js_ and change it to _cordova.js_
 
 And rename it to Cordova *if* you're using Cordova instead of Phonegap:
 
