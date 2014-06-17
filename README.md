@@ -24,7 +24,7 @@ COMPILING IT / TESTING IT
 
 This ready-to-run app is designed for use with Phonegap/Cordova, particularly Phonegap Build. Simply upload to Phonegap Build and you'll get back a working phone app.
 
-Using Eclipse or XCode may have different results. If you run into issues trying to compile it yourself on XCode or Eclipse, let me know and I'll see what I can do.
+This code can also form the starting content of the _www_ folder in your Cordova/Phonegap application, and then compiled with Eclipse and XCode.
 
 The HTML/JS will work in Google Chrome, if you enable file access:
     chrome.exe --allow-file-access
