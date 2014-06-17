@@ -38,34 +38,34 @@ This code can also form the starting content of the _www_ folder in your Cordova
 First, look in _config.xml_ for the "only for PhoneGap Build" paragraphs. You'll want to remove these as they're for the Build service and are not used in local builds.
 
 Second, follow the usual steps for creating a Cordova project:
-    cordova create MyApp org.myself.myapp "My Application"
-    cd MyApp
-    cordova platform add android
-    cordova platform add ios
+> cordova create MyApp org.myself.myapp "My Application"
+> cd MyApp
+> cordova platform add android
+> cordova platform add ios
 
 Add some required plugins:
-    cordova plugins add org.apache.cordova.file
-    cordova plugins add org.apache.cordova.file-transfer
-    cordova plugins add org.apache.cordova.geolocation
-    cordova plugins add org.apache.cordova.network-information
-    cordova plugins add org.apache.cordova.device
+> cordova plugins add org.apache.cordova.file
+> cordova plugins add org.apache.cordova.file-transfer
+> cordova plugins add org.apache.cordova.geolocation
+> cordova plugins add org.apache.cordova.network-information
+> cordova plugins add org.apache.cordova.device
 
 Replace the content of _www_ with the MobileMapStarter HTML/JS/CSS payload.
 
 And a small edit to index.html
-    Look for this tag:
-        <script src="phonegap.js"></script>
-    And rename it to Cordova *if* you're using Cordova instead of Phonegap:
-        <script src="cordova.js"></script>
+Look for this tag:
+> <script src="phonegap.js"></script>
+And rename it to Cordova *if* you're using Cordova instead of Phonegap:
+> <script src="cordova.js"></script>
 
 You should be ready to emulate and build:
-    cordova prepare android
-    cordova run android
-    cordova build android --release
+> cordova prepare android
+> cordova run android
+> cordova build android --release
 
-    cordova prepare ios
-    (then use Run in Xcode)
-    (use Archive in Xcode)
+> cordova prepare ios
+> (then use Run in Xcode)
+> (use Archive in Xcode)
 
 
 PROTOTYPING IN CHROME
