@@ -2,7 +2,7 @@
  * A class for caching tiles for registered L.TileLayer instances, then changing their URL so they use the offline tiles.
  * That is to say, a helper which allows L.TileLayer instances to be used online and offline.
  * The L.TileLayer MUST have a "name" option specified in its options, so the layer can be uniquely identified,
- * particularly in the creatiuon of subfolders for storing the tiles.
+ * particularly in the creation of subfolders for storing the tiles.
  * 
  * Usage example:
  *     // instantiate a layer, then initialize the map after the filesystem comes ready
@@ -72,8 +72,7 @@ var OfflineTileCacher = function(directoryname) {
             filesystem.root.getDirectory(myself.subdirname, {create:true, exclusive:false}, function (subdir) {
                 // store the reference to our own directory
                 myself.DIRECTORY = subdir;
-                // create a subdir for tiles
-                // if iOS then also set the metadata flag so it won't get backed up, per store policy
+                // create a subdir for tiles; set it to no-backup (yes 1 means NOT to back up) for Apple Store compliance
                 subdir.getDirectory('tiles', {create:true, exclusive:false}, function (tilesubdir) {
                     myself.TILEDIRECTORY = tilesubdir;
                     if (is_ios()) {
@@ -95,29 +94,18 @@ var OfflineTileCacher = function(directoryname) {
         if (is_cordova()) {
             // Phonegap/Cordova, skip straight to requesting the filesystem
             window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, filesystem_ok, filesystem_fail);
+        } else if (window.webkitRequestFileSystem) {
+            // Chrome
+            navigator.webkitPersistentStorage.requestQuota(
+                1000*1024*1024, // quota is required in Webkit, so give a 1000 MB quota
+                function(granted_bytes) { window.webkitRequestFileSystem(window.PERSISTENT, granted_bytes, filesystem_ok, filesystem_fail); },
+                function(error) { alert('Failed to request quota: ' + error.code); if (failure) failure(); }
+            );
         } else {
-            // Webkit, request a quota approval THEN move on to requesting a filesystem
-            // Chrome deprecated window.webkitStorageInfo so now we use navigator.webkitPersistentStorage which is slightly different
-            if ( is_cordova() ) {
-                // Cordova/Phonegap
-                window.storageInfo.requestQuota(
-                    1000*1024*1024, // quota is required, so give a 1000 MB quota
-                    function() { window.requestFileSystem(window.storageInfo.PERSISTENT, quota, filesystem_ok, filesystem_fail);  },
-                    function(error) { alert('Failed to request quota: ' + error.code); if (failure) failure(); }
-                );
-            } else if (window.webkitRequestFileSystem) {
-                // Chrome
-                navigator.webkitPersistentStorage.requestQuota(
-                    1000*1024*1024, // quota is required in Webkit, so give a 1000 MB quota
-                    function(granted_bytes) { window.webkitRequestFileSystem(window.PERSISTENT, granted_bytes, filesystem_ok, filesystem_fail);  },
-                    function(error) { alert('Failed to request quota: ' + error.code); if (failure) failure(); }
-                );
-            } else {
-                // something else, and not something we support: make a message then call the failure callback
-                alert('Your device does not support the HTML5 File API.');
-                if (failure) failure();
-                return;
-            }
+            // something else, and not something we support: make a message then call the failure callback
+            mobilealert('Your device does not support the HTML5 File API.');
+            if (failure) failure();
+            return;
         }
 
         // INIT PART 2: define FileTransfer as either the FileTransfer function (Cordova) or else a XHR wrapper (Chrome)
@@ -174,15 +162,11 @@ var OfflineTileCacher = function(directoryname) {
         // Cordova: myself.FS.root.fullPath is the true pathname and it works as-is
         var filename = [tilelayer.options.name,'{z}','{x}','{y}'].join('-') + '.png';
         if (is_cordova() ) {
-            tilelayer._url_offline = CACHE.TILEDIRECTORY.fullPath + '/' + filename;
+            tilelayer._url_offline = CACHE.TILEDIRECTORY.toURL() + '/' + filename;
         } else {
-            // Chrome: filesystem:http://HOST/persistent/APPNAME/filename
             var urlparts = parseURL(document.location.href);
-            var host     = urlparts.host;
-            var proto    = urlparts.protocol;
-            var dirname  = urlparts.path.replace(/\/$/,'').split('/')
-                dirname  = dirname[ dirname.length-1 ];
-            tilelayer._url_offline = 'filesystem:' + proto + '://' + host + '/persistent/' + dirname + '/' + this.tiledirname + '/' + filename;
+            dir = urlparts.protocol + '://' + urlparts.host + '/persistent/';
+            tilelayer._url_offline = 'filesystem:' + dir + filename;
         }
 
         // done adding the two URL versions; log it to our registry
@@ -296,32 +280,41 @@ var OfflineTileCacher = function(directoryname) {
      * Given a list of URLs and an index in that list, make the download.
      * On success, call myself.downloadFile(index+1). Repeat until index>length
      */
-    this.downloadFile = function(urls,index,progress,error) {
+    this.downloadFile = function(urls,index,progress,error_handler) {
         var myself = this;
 
-        // if the index is past the end, we're done; no need to call the progress handler, the last file download already would have
+        // if the index is past the end, we're done
+        // no need to call the progress handler, the last file download already would have called it
         if (index >= urls.length) return;
+
+        // if we don't have Internet, this download can't possibly work
+        // make an alert and then call the error handler
+        if (! has_internet() ) {
+            mobilealert('Cannot download map data. No internet connection.');
+            if (error_handler) error_handler();
+        }
 
         // does this file exist? if so (succesful file open) then move on to the next one
         // if not, then proceed with downloading it
         var filename_exists = urls[index].filename;
         myself.TILEDIRECTORY.getFile(filename_exists, {create:false}, function () {
-            // file opened successfully, so we don't nee to download it
+            // file opened successfully, so we don't need to download it
             //console.log(['already in cache',filename_exists]);
             if (progress) progress(index+1,urls.length);
-            myself.downloadFile(urls,index+1,progress);
+            myself.downloadFile(urls,index+1,progress,error_handler);
         }, function () {
             // file open failed, which means we need to download it
             // design pattern to do sequential asynchronous downloads: on success, call download(index+1)
             //console.log(['not in cache',filename_exists]);
             myself.FileTransfer.download(urls[index].url, urls[index].filename,
                 function(file) {
-                    // if iOS then set the metadata flag so it won't get backed up, per store policy
+                    // tile downloaded OK
+                    // set the Apple "don't back up" flag for iTUnes Connect / Apple Store compliance, then move on to the next URL on the list   (yes 1 means DO NOT backup)
                     if (is_ios()) {
                         file.setMetadata(null, null, { "com.apple.MobileBackup":1});
                     }
                     if (progress) progress(index+1,urls.length);
-                    myself.downloadFile(urls,index+1,progress);
+                    myself.downloadFile(urls,index+1,progress,error_handler);
                 },
                 function(error) {
                     var errmsg;
@@ -341,7 +334,7 @@ var OfflineTileCacher = function(directoryname) {
                             break;
                     }
                     alert("Download error.\n" + errmsg);
-                    if (error) error();
+                    if (error_handler) error_handler();
                 }
             );
         });
@@ -384,13 +377,12 @@ var OfflineTileCacher = function(directoryname) {
                     }
                     //console.log(url);
 
-                    var filename = myself.TILEDIRECTORY.fullPath + '/' + [layername,z,x,y].join('-') + '.png';
+                    // make up the filename, a flat list of files under the tiles/ directory
+                    var filename = myself.TILEDIRECTORY.toURL() + '/' + [layername,z,x,y].join('-') + '.png';
                     //console.log(filename);
 
                     // add it to the list
-                    downloads[downloads.length] = {
-                        layername:layername, x:x, y:y, z:z, filename:filename, url:url
-                    };
+                    downloads[downloads.length] = { layername:layername, x:x, y:y, z:z, filename:filename, url:url };
                 } // end of this X/Y/tile URL
             } // end of the X column
         } // end of z zoom level
@@ -398,7 +390,7 @@ var OfflineTileCacher = function(directoryname) {
 
         // make sure we're not asking for too much
         if (downloads.length > myself.MAX_TILES) {
-            alert("The selected area is too large.\nPlease zoom in to a smaller area.");
+            mobilealert("The selected area is too large. Please zoom in to a smaller area.", null, "Area too large", "OK");
             return;
         }
 
