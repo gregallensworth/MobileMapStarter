@@ -5,35 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
     <title>MobileMapStarter</title>
     <script src="phonegap.js"></script>
-
-    <!-- jQuery and JQ Mobile -->
-    <script type="text/javascript" src="libs/jquery-1.11.0.min.js"></script>
-    <script type="text/javascript" src="libs/jquery.mobile-1.4.0/jquery.mobile-1.4.0.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="libs/jquery.mobile-1.4.0/jquery.mobile-1.4.0.css" />
-
-    <!-- Leaflet et al -->
-    <link rel="stylesheet" type="text/css" href="libs/leaflet-0.7.2/leaflet.css" />
-    <script type="text/javascript" src="libs/leaflet-0.7.2/leaflet-src.js"></script>
-
-    <!-- a caching system for Leaflet L.TileLayer -->
-    <script type="text/javascript" src="libs/cache.js"></script>
-
-    <!-- weinre debugging for development; replace with your own IP address and your own weinre server -->
-    <!--
-    <script src="http://weinre.greeninfo.org:8080/target/target-script-min.js#mobilemapstarter"></script>
-    -->
-
-    <!-- our own custom stuff. on device ready, the init() function in index.js will be called to start up everything -->
-    <link rel="stylesheet" type="text/css" href="index.css" />
-    <script type="text/javascript" src="index.js"></script>
-    <script type="text/javascript" src="library.js"></script>
-    <script type="text/javascript">
-    if ( is_cordova() ) {
-        document.addEventListener("deviceready", init, false);
-    } else {
-        $(document).ready(init);
-    }
-    </script>
 </head>
 <body>
 
@@ -151,6 +122,51 @@
     </div>
 </div>
 
+
+<div data-role="dialog" id="dialog-error">
+    <div data-role="header">
+        <h1></h1>
+    </div>
+    <div data-role="content">
+    </div>
+</div>
+
+
+
+<!--
+JAVASCRIPT CODE: putting it at the end of the BODY solves race conditions on iPad
+If you run this via Xcode or if you use weinre, or if you run on emulators,
+there's enough added lag that these race conditions will not happen
+but when you run it "for real" the deviceready simply never happens and your app doesn't work at all.
+-->
+    <!-- jQuery and JQ Mobile -->
+    <script type="text/javascript" src="libs/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="libs/jquery.mobile-1.4.0/jquery.mobile-1.4.0.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="libs/jquery.mobile-1.4.0/jquery.mobile-1.4.0.css" />
+
+    <!-- Leaflet et al -->
+    <link rel="stylesheet" type="text/css" href="libs/leaflet-0.7.2/leaflet.css" />
+    <script type="text/javascript" src="libs/leaflet-0.7.2/leaflet-src.js"></script>
+
+    <!-- a caching system for Leaflet L.TileLayer -->
+    <script type="text/javascript" src="libs/cache.js"></script>
+
+    <!-- weinre debugging for development; replace with your own IP address and your own weinre server -->
+    <!--
+    <script src="http://weinre.greeninfo.org:8080/target/target-script-min.js#mobilemapstarter"></script>
+    -->
+
+    <!-- our own custom stuff. on device ready, the init() function in index.js will be called to start up everything -->
+    <link rel="stylesheet" type="text/css" href="index.css" />
+    <script type="text/javascript" src="index.js"></script>
+    <script type="text/javascript" src="library.js"></script>
+    <script type="text/javascript">
+    if ( is_cordova() ) {
+        document.addEventListener("deviceready", init, false);
+    } else {
+        $(document).ready(init);
+    }
+    </script>
 
 </body>
 </html>
