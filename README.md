@@ -19,15 +19,45 @@ Components of this app:
 * File API and L.TileLayer caching system -- Cache Leaflet tiles to device storage for offline use.
 
 
-COMPILING IT / TESTING IT
+COMPILING IT - PHONEGAP BUILD
 ================
 
-This ready-to-run app is designed for use with Phonegap/Cordova, particularly Phonegap Build. Simply upload to Phonegap Build and you'll get back a working phone app.
+This ready-to-run app is designed for use with Phonegap/Cordova, particularly Phonegap Build.
+
+Simply upload to Phonegap Build and you'll get back a working phone app.
+
+Tip: I myself don't use Phonegap Build due to some issues. Most notably, Android apps are not set to singleTask mode, meaning that when the user taps the icon and the app is already running, a new instance is started without the prior state, selections, etc. I prefer to compile using the Cordova command-line tools and Xcode.
+
+
+COMPILING IT - Xcode and Eclipse
+================
 
 This code can also form the starting content of the _www_ folder in your Cordova/Phonegap application, and then compiled with Eclipse and XCode.
 
+First, look in _config.xml_ for the "only for PhoneGap Build" paragraphs. You'll want to remove these as they're for the Build service and are not used in local builds.
+
+Second, follow the usual steps for creating a Cordova project:
+    cordova create MyApp org.myself.myapp "My Application"
+    cd MyApp
+    cordova platform add android
+    cordova platform add ios
+
+Lastly, replace the content of _www_ with the MobileMapStarter HTML/JS/CSS payload, and you should be ready to emulate and build:
+    cordova prepare android
+    cordova run android
+    cordova build android --release
+
+    cordova prepare ios
+    (then use Run in Xcode)
+    (use Archive in Xcode)
+
+
+PROTOTYPING IN CHROME
+================
+
 The HTML/JS will work in Google Chrome, if you enable file access:
     chrome.exe --allow-file-access
+
 I don't recommend developing using file:// URLs, as the File API is still buggy even if you give the --allow-file-access-from-files flag. Instead, install a webserver on your machine and use http://localhost/ URLs.
 
 
