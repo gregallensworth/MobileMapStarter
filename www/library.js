@@ -110,9 +110,10 @@ function geocode(address,success_callback,failure_callback) {
         };
     }
 
-//GDA
     // set up the request and send it off. Thanks jQuery!
     // Nominatim's API returns a simple list; no deep metadata to wade through to get at the results list
+    // but massage/standardize it into a list of {w,s,e,n,lat,lng,name} objects so our arbitrary caller at least knows what to expect
+    // this helps in the future to standardize/abstract changeovers to other geocoding providers
     var url = 'https://nominatim.openstreetmap.org/search';
     var params    = {};
     params.q      = address;
@@ -122,16 +123,24 @@ function geocode(address,success_callback,failure_callback) {
         url: url,
         'data': params,
         dataType: 'jsonp',
-        jsonp: 'jsonp',
+        jsonp: 'json_callback',
         success: function (resultlist) {
             if (! resultlist || ! resultlist.length) failure_callback();
 
-//gda
-            alert(resultlist);
-            alert(resultlist[0].boundingbox);
-            alert(resultlist[0].name);
+            var results = [];
+            $.each(resultlist, function () {
+                var lat  = parseFloat( this.lat );
+                var lng  = parseFloat( this.lng );
+                var name = this.display_name;
+                var n    = parseFloat( this.boundingbox[0] );
+                var s    = parseFloat( this.boundingbox[1] );
+                var w    = parseFloat( this.boundingbox[2] );
+                var e    = parseFloat( this.boundingbox[3] );
 
-            success_callback(resultlist);
+                results.push({w:w, s:s, e:e, n:n, lat:lat, lng:lng, name:name });
+            });
+
+            success_callback(results);
         },
         crossDomain: true
     });
