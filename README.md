@@ -49,7 +49,7 @@ Customizing Your App
 
 Check out _config.xml_ to start personalizing your app: the name, author attribution, permissions, and so on. You'll also need to do this in iOS via Xcode.
 
-To change the name of the app, it's easiest to simply remove and re-add the platforms using _cordova platform rm ios android_ and _cordova platform add ios android_. The platform tool will read _config.xml_ and generate the Xcode file and the AndroidManifest based on the <name> tag in _config.xml_ But then you'll want to re-instate a few platform-specific hacks:
+To change the name of the app after you've edited _config.xml_, it's easiest to simply remove and re-add the platforms using _cordova platform rm ios android_ and _cordova platform add ios android_. The platform tool will read _config.xml_ and generate the Xcode file and the AndroidManifest based on the <name> tag in _config.xml_ But then you'll want to re-instate a few platform-specific hacks:
 + For iOS you probably want to disable the status bar. This is done via Xcode: see the _Info_ section and set "View Controller-Based Status Bar" to false, and the _General_ section to set "Status Bar Style" to "Hide during application launch".
 + For Android, you'll want to set _singleTask_ mode, so the app can be reopened if the user switches to something else. Open _platforms/android/AndroidManifest.xml_ and look for the <activity> element. Add this attribute: _android:launchMode="singleTask"_
 
