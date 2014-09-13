@@ -4,3 +4,4 @@ platforms/android/CordovaLib/ant-build/
 platforms/android/CordovaLib/ant-gen/
 platforms/android/ant-gen/
 platforms/android/ant-build/
+platforms/android/res/xml/config.xml
