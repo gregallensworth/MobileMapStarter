@@ -7,6 +7,16 @@ A starting framework for mobile maps using Cordova/Phonegap.
 A minimal but functional, standalone mobile app from which to build your own creations.
 
 
+Getting It
+================
+
+I recommend a tested, known-stable build:
+
+    https://github.com/gregallensworth/MobileMapStarter/releases
+
+You can grab master if you're feeling adventurous, or if you want to help with MobileMapStarter.
+
+
 Compiling and Launching
 ================
 
