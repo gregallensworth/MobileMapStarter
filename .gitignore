@@ -5,3 +5,8 @@ platforms/android/CordovaLib/ant-gen/
 platforms/android/ant-gen/
 platforms/android/ant-build/
 platforms/android/res/xml/config.xml
+.DS_Store
+platforms/.DS_Store
+platforms/ios/CordovaLib/CordovaLib.xcodeproj/xcuserdata/
+platforms/ios/MobileMapStarter.xcodeproj/project.xcworkspace/
+platforms/ios/MobileMapStarter.xcodeproj/xcuserdata/
