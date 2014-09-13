@@ -1,0 +1,6 @@
+platforms/ios/www
+platforms/android/assets/www
+platforms/android/CordovaLib/ant-build/
+platforms/android/CordovaLib/ant-gen/
+platforms/android/ant-gen/
+platforms/android/ant-build/
