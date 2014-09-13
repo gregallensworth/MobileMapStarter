@@ -13,15 +13,15 @@
                             "count": 1
                         },
                         {
-                            "xml": "<feature name=\"Geolocation\"><param name=\"ios-package\" value=\"CDVLocation\" /></feature>",
-                            "count": 1
-                        },
-                        {
                             "xml": "<feature name=\"File\"><param name=\"ios-package\" value=\"CDVFile\" /><param name=\"onload\" value=\"true\" /></feature>",
                             "count": 1
                         },
                         {
                             "xml": "<feature name=\"FileTransfer\"><param name=\"ios-package\" value=\"CDVFileTransfer\" /></feature>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"Geolocation\"><param name=\"ios-package\" value=\"CDVLocation\" /></feature>",
                             "count": 1
                         }
                     ]
@@ -29,12 +29,6 @@
             },
             "framework": {
                 "parents": {
-                    "CoreLocation.framework": [
-                        {
-                            "xml": "false",
-                            "count": 1
-                        }
-                    ],
                     "AssetsLibrary.framework": [
                         {
                             "xml": "false",
@@ -42,6 +36,12 @@
                         }
                     ],
                     "MobileCoreServices.framework": [
+                        {
+                            "xml": "false",
+                            "count": 1
+                        }
+                    ],
+                    "CoreLocation.framework": [
                         {
                             "xml": "false",
                             "count": 1
@@ -55,13 +55,13 @@
         "org.apache.cordova.device": {
             "PACKAGE_NAME": "org.greeninfo.mobilemapstarter"
         },
-        "org.apache.cordova.geolocation": {
-            "PACKAGE_NAME": "org.greeninfo.mobilemapstarter"
-        },
         "org.apache.cordova.file": {
             "PACKAGE_NAME": "org.greeninfo.mobilemapstarter"
         },
         "org.apache.cordova.file-transfer": {
+            "PACKAGE_NAME": "org.greeninfo.mobilemapstarter"
+        },
+        "org.apache.cordova.geolocation": {
             "PACKAGE_NAME": "org.greeninfo.mobilemapstarter"
         }
     },
