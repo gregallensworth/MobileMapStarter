@@ -1,10 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-    <!-- BASIC INFO: NAME, VERSION, AUTHOR -->
-    <widget xmlns = "http://www.w3.org/ns/widgets"
-        xmlns:gap = "http://phonegap.com/ns/1.0"
-        id        = "org.greeninfo.mobilemapstarter"
-        version   = "1.1.1">
-    <name>MobileMapStarter</name>
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="org.greeninfo.mobilemapstarter" version="1.1.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <description>
         A starting framework for mobile maps using Cordova/Phonegap. A minimal but functional, standalone mobile app from which to build your own creations.
         For more information, see the Github repository https://github.com/gregallensworth/MobileMapStarter
@@ -13,91 +8,16 @@
         Greg Allensworth @ GreenInfo Network
     </author>
 
-    <!-- the splash screen duration, then load up index.html as our starting point -->
+    <!-- the starting view page -->
     <content src="index.html" />
-    <preference name="splashscreen" value="splash" />
-    <preference name="splashscreendelay" value="3000" />
 
     <!-- allow HTTP downloads, e.g. for map tiles -->
     <access origin="*" />
 
-    <!-- only for PhoneGap Build -->
-    <!-- build only for these platforms -->
-    <gap:platform name="ios" />
-    <gap:platform name="android" />
-    <!-- <gap:platform name="winphone" /> -->
+    <preference name="splashscreen" value="splash" />
+    <preference name="splashscreendelay" value="3000" />
 
-    <!-- only for PhoneGap Build -->
-    <!-- THE ICON -->
-    <!--
-    All icons must be 32-bit PNGs, and should use alpha channel and transparency effects to fit modern design vogue.
-    Additional design considerations:  http://developer.android.com/guide/practices/ui_guidelines/icon_design_launcher.html
-    -->
-        <icon src="icons/icon.png" /> <!-- default icon -->
-        <icon src="icons/ios/57.png" gap:platform="ios" width="57" height="57" />
-        <icon src="icons/ios/72.png" gap:platform="ios" width="72" height="72" />
-        <icon src="icons/ios/114.png" gap:platform="ios" width="114" height="114" />
-        <icon src="icons/android/ldpi.png" gap:platform="android" gap:density="ldpi" /> <!--  36 x 36 px -->
-        <icon src="icons/android/mdpi.png" gap:platform="android" gap:density="mdpi" /> <!--  48 x 48 px -->
-        <icon src="icons/android/hdpi.png" gap:platform="android" gap:density="hdpi" /> <!--  72 x 72 px -->
-        <icon src="icons/android/xhdpi.png" gap:platform="android" gap:density="xhdpi" /> <!--  96 x 96 px -->
-
-    <!-- only for PhoneGap Build -->
-    <!-- THE SPLASH SCREEN -->
-    <!--
-    PNG files for the splash screen. A default one, a set for iPad and a set for Android.
-    NOTE: You can substantially reduce file size, by creating 256-color 8-bit PNGs  (Indexed Color mode).
-    -->
-        <gap:splash src="splash/splash.png" /> <!-- the default splash screen -->
-        <gap:splash src="splash/ios/320_480.png" gap:platform="ios" width="320" height="480" /> <!-- iPhone low-res / iPod Touch -->
-        <gap:splash src="splash/ios/640_960.png" gap:platform="ios" width="640" height="960" /> <!-- iPhone higher-res -->
-        <gap:splash src="splash/ios/1024_768.png" gap:platform="ios" width="1024" height="768" /> <!-- iPad landscape -->
-        <gap:splash src="splash/ios/768_1024.png" gap:platform="ios" width="768" height="1024" /> <!-- iPad portrait -->
-        <gap:splash src="splash/ios/640_1136.png" gap:platform="ios" width="640" height="1136" /> <!-- iPhone 5 -->
-        <gap:splash src="splash/android/ldpi.png" gap:platform="android" gap:density="ldpi" /> <!-- 426 x 320 px -->
-        <gap:splash src="splash/android/mdpi.png" gap:platform="android" gap:density="mdpi" /> <!-- 470 x 320 px -->
-        <gap:splash src="splash/android/hdpi.png" gap:platform="android" gap:density="hdpi" /> <!-- 640 x 480 px -->
-        <gap:splash src="splash/android/xhdpi.png" gap:platform="android" gap:density="xhdpi" /> <!-- 960 x 720 px -->
-
-    <!-- only for PhoneGap Build -->
-    <!-- PERMISSIONS -->
-    <!--
-    This is important for the credibility of your application, if distributed to strangers via the App Store. Don't just include everything.
-    -->
-    <!-- Core plugins -->
-        <gap:plugin name="org.apache.cordova.battery-status" />
-        <gap:plugin name="org.apache.cordova.camera" />
-        <gap:plugin name="org.apache.cordova.media-capture" />
-        <gap:plugin name="org.apache.cordova.console" />
-        <gap:plugin name="org.apache.cordova.contacts" />
-        <gap:plugin name="org.apache.cordova.device" />
-        <gap:plugin name="org.apache.cordova.device-motion" />
-        <gap:plugin name="org.apache.cordova.device-orientation" />
-        <gap:plugin name="org.apache.cordova.dialogs" />
-        <gap:plugin name="org.apache.cordova.file" />
-        <gap:plugin name="org.apache.cordova.file-transfer" />
-        <gap:plugin name="org.apache.cordova.geolocation" />
-        <gap:plugin name="org.apache.cordova.globalization" />
-        <gap:plugin name="org.apache.cordova.inappbrowser" />
-        <gap:plugin name="org.apache.cordova.media" />
-        <gap:plugin name="org.apache.cordova.network-information" />
-        <gap:plugin name="org.apache.cordova.splashscreen" />
-        <gap:plugin name="org.apache.cordova.vibration" />
-
-    <!-- IOS STUFF -->
-        <!-- should hyperlinks open within the app's webview or the default browser? true=app webview, false=browser -->
-        <preference name="stay-in-webview" value="true" />
-        <!-- should phone numbers and email addresses automagically become hyperlinks to default actions? (true=yes, false=no) -->
-        <preference name="detect-data-types" value="true" />
-        <!-- should the app terminate when the home button is pressed or stay running and simply resume? true=terminate, false=stay -->
-        <preference name="exit-on-suspend" value="false" />
-
-    <!-- Apple Store compliance: do not backup our created files -->
-        <preference name="iosPersistentFileLocation" value="Library" />
-        <preference name="BackupWebStorage" value="none" />
-
-    <!-- ANDROID STUFF -->
-        <!-- how many milliseconds to show the splashscreen? -->
-        <preference name="splash-screen-duration" value="3000" />
-
+    <!-- Apple Store compliance: do not backup our created files; still need to setMetadata() though -->
+    <preference name="iosPersistentFileLocation" value="Library" />
+    <preference name="BackupWebStorage" value="none" />
 </widget>

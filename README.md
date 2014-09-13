@@ -1,17 +1,25 @@
 MobileMapStarter
 ================
 
+https://github.com/gregallensworth/MobileMapStarter
+
 A starting framework for mobile maps using Cordova/Phonegap.
 A minimal but functional, standalone mobile app from which to build your own creations.
 
-This app is designed for Phonegap/Cordova, therefore it is HTML, JavaScript, and CSS.
-This consists of ONLY the HTML/CSS/JS components, and not the working Cordova libraries and binaries, the Xcode project files, and so on.
+This is a ready-to-run starter application for Phonegap/Cordova.
+Assuming that you have the Cordova build environment all set (run "cordova" from CLI, for instance) you should be able to run this and have a map app:
+    git clone https://github.com/gregallensworth/MobileMapStarter.git
+    cordova prepare android
+    cordova run android
 
-Components of this app:
+    OR
+    git clone https://github.com/gregallensworth/MobileMapStarter.git
+    open platforms/ios/MobileMapStarter.xcodeproj in Xcode
+    use curly-R to run it on your device.emulator
 
-* HTML/CSS/JS layout -- The app is ready to compile and run via Phonegap.
 
-* config.xml -- The app is ready to upload to Phonegap Build. The included config.xml specifies permissions, icons and splash screens, and more in an easy-to-edit template.
+General Walkthrough
+================
 
 * jQuery Mobile -- A mobile-style user interface theme. Includes jQuery which makes JavaScript useful.
 
@@ -19,89 +27,27 @@ Components of this app:
 
 * File API and L.TileLayer caching system -- Cache Leaflet tiles to device storage for offline use.
 
+* HTML/CSS/JS layout -- The _www_ folder has Leaflet, jQuery Mobile, etc. built into a nice starting place for your map app
 
-COMPILING IT - PHONEGAP BUILD
+
+Phonegap Build
 ================
 
-This ready-to-run app is designed for use with Phonegap/Cordova, particularly Phonegap Build.
+The content of the _www_ folder should be ready-to-run app with Phonegap Build. You should be able to ZIP up that content and upload to PGB.
 
-Simply upload to Phonegap Build and you'll get back a working phone app.
-
-Tip: I myself don't use Phonegap Build due to some issues. Most notably, Android apps are not set to singleTask mode, meaning that when the user taps the icon and the app is already running, a new instance is started without the prior state, selections, etc. Additionally, you can't set more advanced settings such as hiding the taskbar in iOS, using plugins beyond the few supported by Build, and so on.
+Tip: I myself don't use Phonegap Build due to some issues. Most notably, Android apps are not set to singleTask mode, meaning that when the user taps the icon and the app is already running, a new instance is started without the prior state, selections, etc. Additionally, you can't set more advanced settings such as hiding the taskbar in iOS, using plugins beyond the few supported by Build, and so on. If you have trouble with Build, consider setting up a Mac with a build environment.
 
 
-COMPILING IT - Xcode and Eclipse
+Customizing Your App
 ================
 
-This code can also form the starting content of the _www_ folder in your Cordova/Phonegap application, and then compiled with Eclipse and XCode.
+Start with _index.js_ This includes basic settings such as default lat/lng/zoom and your Bing API key.
 
-First, look in _config.xml_ for the "only for PhoneGap Build" paragraphs. You'll want to remove these as they're for the Build service and are not used in local builds.
+Check out _config.xml_ to start personalizing your app: the name, author attribution, permissions, and so on. You'll also need to do this in iOS via Xcode.
 
-Second, follow the usual steps for creating a Cordova project:
+For iOS you probably want to disable the status bar. This is done via Xcode: see the _Info_ section and set "View Controller-Based Status Bar" to false, and the _General_ section to set "Status Bar Style" to "Hide during application launch".
 
-> cordova create MyApp org.myself.myapp "My Application"
-
-> cd MyApp
-
-> cordova platform add android
-
-> cordova platform add ios
-
-Add some required plugins:
-
-> cordova plugins add org.apache.cordova.file
-
-> cordova plugins add org.apache.cordova.file-transfer
-
-> cordova plugins add org.apache.cordova.geolocation
-
-> cordova plugins add org.apache.cordova.network-information
-
-> cordova plugins add org.apache.cordova.device
-
-Replace the content of _www_ with the MobileMapStarter HTML/JS/CSS payload.
-
-And a small edit to index.html
-
-If you're using Cordova instead of Phonegap, look in _index.html_  for the _<script>_ tag for _phonegap.js_ and change it to _cordova.js_
-
-And rename it to Cordova *if* you're using Cordova instead of Phonegap:
-
-> <script src="cordova.js"></script>
-
-You should be ready to emulate and build:
-
-> cordova prepare android
-
-> cordova run android
-
-> cordova build android --release
-
-> cordova prepare ios
-
-> (then use Run in Xcode)
-
-> (use Archive in Xcode)
-
-
-PROTOTYPING IN CHROME
-================
-
-The HTML/JS will work in Google Chrome, if you enable file access:
-
-> chrome.exe --allow-file-access
-
-I don't recommend developing using file:// URLs, as the File API is still buggy even if you give the --allow-file-access-from-files flag. Instead, install a webserver on your machine and use http://localhost/ URLs.
-
-
-WALKTHROUGH: EXPLAINING THE CODE & CUSTOMIZING YOUR APP
-================
-
-Start with index.js This includes basic settings such as default lat/lng/zoom and your Bing API key.
-
-Check out config.xml to start personalizing your app: the name, author attribution, permissions, and so on.
-
-Swap out splash screens and icons. See splash.png and icon.png, then the splash/ and icons/ folders.
+Swap out splash screens and icons. See _platforms/ios/MobileMapStarter/Resources_ and _platforms/android/res_
 
 Now start customizing HTML (index.html), CSS (index.css), and JavaScript code (index.js), and start swapping out icons and other graphics under the img/ folder.
 
@@ -111,5 +57,4 @@ Additional, possibly useful, utility functions are found in library.js
 BUGS / TODO / WISHES
 ================
 
-* Nothing, the app is perfect in every way.  ;)
-
+See the Issues page for a full list.
