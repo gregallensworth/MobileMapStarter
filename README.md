@@ -6,14 +6,20 @@ https://github.com/gregallensworth/MobileMapStarter
 A starting framework for mobile maps using Cordova/Phonegap.
 A minimal but functional, standalone mobile app from which to build your own creations.
 
+
+Compiling and Launching
+================
+
 This is a ready-to-run starter application for Phonegap/Cordova.
 Assuming that you have the Cordova build environment all set (run "cordova" from CLI, for instance) you should be able to run this and have a map app:
+    # Android
     git clone https://github.com/gregallensworth/MobileMapStarter.git
     cordova prepare android
     cordova run android
 
-    OR
+    # iOS / Xcode
     git clone https://github.com/gregallensworth/MobileMapStarter.git
+    cordova prepare ios
     open platforms/ios/MobileMapStarter.xcodeproj in Xcode
     use curly-R to run it on your device.emulator
 
@@ -41,17 +47,19 @@ Tip: I myself don't use Phonegap Build due to some issues. Most notably, Android
 Customizing Your App
 ================
 
-Start with _index.js_ This includes basic settings such as default lat/lng/zoom and your Bing API key.
-
 Check out _config.xml_ to start personalizing your app: the name, author attribution, permissions, and so on. You'll also need to do this in iOS via Xcode.
 
-For iOS you probably want to disable the status bar. This is done via Xcode: see the _Info_ section and set "View Controller-Based Status Bar" to false, and the _General_ section to set "Status Bar Style" to "Hide during application launch".
+To change the name of the app, it's easiest to simply remove and re-add the platforms using _cordova platform rm ios android_ and _cordova platform add ios android_. The platform tool will read _config.xml_ and generate the Xcode file and the AndroidManifest based on the <name> tag in _config.xml_ But then you'll want to re-instate a few platform-specific hacks:
++ For iOS you probably want to disable the status bar. This is done via Xcode: see the _Info_ section and set "View Controller-Based Status Bar" to false, and the _General_ section to set "Status Bar Style" to "Hide during application launch".
++ For Android, you'll want to set _singleTask_ mode, so the app can be reopened if the user switches to something else. Open _platforms/android/AndroidManifest.xml_ and look for the <activity> element. Add this attribute: _android:launchMode="singleTask"_
 
 Swap out splash screens and icons. See _platforms/ios/MobileMapStarter/Resources_ and _platforms/android/res_
 
-Now start customizing HTML (index.html), CSS (index.css), and JavaScript code (index.js), and start swapping out icons and other graphics under the img/ folder.
+Now start customizing _index.html_ and _index.css_ and _index.js_ to make your app.
 
-Additional, possibly useful, utility functions are found in library.js
+And check out the possibly useful utility functions library.js
+
+Enjoy!
 
 
 Bugs / Todo / Wishes
