@@ -82,18 +82,20 @@ function latLngToGPS(latlng) {
 
 
 /*
- * Query the Bing Locations API, to geocode an address or landmark
- * Pass it a callback for finding results and a callback for finding no results
- * This is based on http://msdn.microsoft.com/en-us/library/gg427601.aspx but is implemented in jQuery
- * This method trims off the resourceSets stuff, passing to the success callback only a list of candidates.
+ * Query the a geocoding service to geocode an address or landmark
+ * Pass an address, a success callback, and an error callback (includes no results).
+ * The success callback receives a list of candidate matches; each match is an object with these attributes:
+ *      w       west side of the recommended bounding box
+ *      s       swouth side of the recommended bounding box
+ *      e       east side of the recommended bounding box
+ *      n       north side of the recommended bounding box
+ *      lat     latitude of the location
+ *      lng     longitude of the location
+ *      name    text name of the result
+ * See the geocodeAndZoom() function for a great example of usage.
  *
- * Example usage:
- * geocode("Corvallis, Oregon", function (results) {
- *     navigator.notification.alert(results[0].point.coordinates);
- *     navigator.notification.alert(results[0].bbox);
- * }, function () {
- *     navigator.notification.alert("Could not find that address.");
- * });
+ * The stock service with MobileMapStarter is Nominatim  https://nominatim.openstreetmap.org/
+ * If you continue to use it, please refer to their usage policy.
  */
 function geocode(address,success_callback,failure_callback) {
     // if the callbacks were omitted, use these defaults
@@ -108,29 +110,29 @@ function geocode(address,success_callback,failure_callback) {
         };
     }
 
-    // this parses the raw response from Bing, figures out whether anything was found, and either
-    // passes off the proper results to the success handler, or calls the error handler if there are 0 results
-    // Yeah, Bing nests the results pretty far down; this mechanism saves you a few steps in your own code
-    function handleReply (result) {
-        if (result && result.resourceSets && result.resourceSets.length > 0 && result.resourceSets[0].resources && result.resourceSets[0].resources.length > 0) {
-            success_callback(result.resourceSets[0].resources);
-        } else {
-            failure_callback();
-        }
-    };
-
+//GDA
     // set up the request and send it off. Thanks jQuery!
-    var url = 'http://dev.virtualearth.net/REST/v1/Locations';
+    // Nominatim's API returns a simple list; no deep metadata to wade through to get at the results list
+    var url = 'https://nominatim.openstreetmap.org/search';
     var params    = {};
-    params.query  = address;
-    params.key    = BING_API_KEY;
-    params.output = 'json';
+    params.q      = address;
+    params.format = 'json';
+    params.limit  = 1; // how many results?
     $.ajax({
         url: url,
         'data': params,
         dataType: 'jsonp',
         jsonp: 'jsonp',
-        success: handleReply,
+        success: function (resultlist) {
+            if (! resultlist || ! resultlist.length) failure_callback();
+
+//gda
+            alert(resultlist);
+            alert(resultlist[0].boundingbox);
+            alert(resultlist[0].name);
+
+            success_callback(resultlist);
+        },
         crossDomain: true
     });
 }
@@ -139,7 +141,7 @@ function geocode(address,success_callback,failure_callback) {
 /*
  * A wrapper around geocode() to handle a very common use case.
  * - change back to #page-map
- * - zoom to Bing's suggested viewport
+ * - fetch the first results, and zoom to its suggested viewport
  * - disable auto-centering and uncheck the checkbox
  *
  * Example usage:
@@ -152,9 +154,10 @@ function geocodeAndZoom(address) {
         $('input[type="checkbox"][name="features"][value="autocenter"]').removeAttr('checked').checkboxradio("refresh");
 
         // change to the map and center on the suggested bounds
+        // hypothetically you could use results[0].lat and results[0].lng to lay a marker, zoom in very closely, etc.
         $.mobile.changePage('#page-map');
         setTimeout(function () {
-            var bbox = new L.LatLngBounds(new L.LatLng(results[0].bbox[0],results[0].bbox[1]),new L.LatLng(results[0].bbox[2],results[0].bbox[3]));
+            var bbox = new L.LatLngBounds(new L.LatLng(results[0].s,results[0].w),new L.LatLng(results[0].n,results[0].e));
             MAP.fitBounds(bbox);
         }, 500);
     }

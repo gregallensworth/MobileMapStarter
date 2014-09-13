@@ -21,10 +21,6 @@ BASEMAPS['terrain'] = new L.TileLayer("http://{s}.tiles.mapbox.com/v3/greeninfo.
 BASEMAPS['photo']   = new L.TileLayer("http://{s}.tiles.mapbox.com/v3/greeninfo.map-zudfckcw/{z}/{x}/{y}.jpg", { name:'Photo', subdomains:['a','b','c','d'] });
 //BASEMAPS['plain']   = new L.TileLayer("http://{s}.tiles.mapbox.com/v3/greeninfo.map-8ljrd2bt/{z}/{x}/{y}.jpg", { name:'Streets', subdomains:['a','b','c','d'] });
 
-// PLEASE USE YOUR OWN Bing API key
-// used primarily by the geocoder
-var BING_API_KEY = "AjBuYw8goYn_CWiqk65Rbf_Cm-j1QFPH-gGfOxjBipxuEB2N3n9yACKu5s8Dl18N";
-
 // the name of a subdirectory where this app will store its content
 // this is particularly important on Android where filesystem is not a sandbox but your SD card
 var STORAGE_SUBDIR = "MobileMapStarter";

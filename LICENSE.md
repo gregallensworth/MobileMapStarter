@@ -10,12 +10,14 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-Bing Maps API Usage
+Geocoder License
 ================
 
-Usage of the Bing Maps API for geocoding services, is subject to the  Microsoft® Bing™ Maps Platform API Terms Of Use available at http://www.microsoft.com/maps/product/terms.html
+Geocoding service included in MobileMapStarter is provided by Nominatim. If you replace the geocoding service (the geocode() function in library.js), then section license would not apply to you.
 
-In my opinion (not to be construed as legal advice) the terms as of May 2014, may place restrictions on the use of the API in commercial software, e.g. if you write an app intended for profit or business use. Please read the Bing API terms, and perhaps choose to use a different geocoder.
+Data Copyright OpenStreetMap contributors, ODbL 1.0. http://www.openstreetmap.org/copyright
+
+Please refer also to Nominatim's usage policy at http://wiki.openstreetmap.org/wiki/Nominatim_usage_policy
 
 
 Leaflet License
