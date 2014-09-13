@@ -1,0 +1,24 @@
+{
+    "version": "1.0.1",
+    "name": "org.apache.cordova.file",
+    "cordova_name": "File",
+    "description": "Cordova File Plugin",
+    "license": "Apache 2.0",
+    "repo": "https://git-wip-us.apache.org/repos/asf/cordova-plugin-file.git",
+    "issue": "https://issues.apache.org/jira/browse/CB/component/12320651",
+    "keywords": [
+        "cordova",
+        "file"
+    ],
+    "platforms": [
+        "android",
+        "amazon-fireos",
+        "ubuntu",
+        "ios",
+        "wp7",
+        "wp8",
+        "blackberry10",
+        "windows8"
+    ],
+    "engines": []
+}
