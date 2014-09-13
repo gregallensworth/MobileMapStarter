@@ -54,7 +54,7 @@ Now start customizing HTML (index.html), CSS (index.css), and JavaScript code (i
 Additional, possibly useful, utility functions are found in library.js
 
 
-BUGS / TODO / WISHES
+Bugs / Todo / Wishes
 ================
 
-See the Issues page for a full list.
+See the Issues page on Github for a full list.
