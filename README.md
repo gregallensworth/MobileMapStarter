@@ -12,6 +12,7 @@ Compiling and Launching
 
 This is a ready-to-run starter application for Phonegap/Cordova.
 Assuming that you have the Cordova build environment all set (run "cordova" from CLI, for instance) you should be able to run this and have a map app:
+
     # Android
     git clone https://github.com/gregallensworth/MobileMapStarter.git
     cordova prepare android
