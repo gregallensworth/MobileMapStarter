@@ -132,14 +132,6 @@ function initMap() {
     // move the geocoder and Settings button to inside the map_canvas, as it's more responsive to size changes that way
     $('.leaflet-control-settings').appendTo( $('#map_canvas') );
     $('#geocoder').appendTo( $('#map_canvas') );
-
-    //GDA tag for removal
-    // Leaflet behavior patch: on a zoomend event, check whether we're at MIN_ZOOM or MAX_ZOOM and show/hide the +/- buttons in the Zoom control
-    MAP.on('zoomend', function () {
-        var z = MAP.getZoom();
-        z <= MIN_ZOOM ? $('.leaflet-control-zoom-out').hide() : $('.leaflet-control-zoom-out').show();
-        z >= MAX_ZOOM ? $('.leaflet-control-zoom-in').hide() : $('.leaflet-control-zoom-in').show();
-    });
 }
 
 
