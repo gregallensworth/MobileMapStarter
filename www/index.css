@@ -15,7 +15,7 @@ h1 {
 
 
 /*** PhoneGap Patches ***/
-
+/*GDA tag for removal */
 a[data-role="button"] {
     text-decoration:none;
 }

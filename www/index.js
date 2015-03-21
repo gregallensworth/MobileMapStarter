@@ -14,16 +14,15 @@ var DEFAULT_ZOOM = 15;
 var MIN_ZOOM = 10;
 var MAX_ZOOM = 16;
 
-// PLEASE USE YOUR OWN Mapbox layers if you use them
-// the "name" attribute is REQUIRED. it's not Leaflet standard, but is used by the cache system.
+// initMap() will load this with some basemaps "terrain" and "photo"
+// using these global references you can toggle the visible basemap via selectBasemap() or using your own programming style
+// THE ONES SUPPLIED AS DEMOS IN initMap() ARE GREENINFO NETWORK'S MAPBOX ACCOUNT
+// PLEASE USE YOUR OWN Mapbox layers if you use them; Mapbox is not free!
 var BASEMAPS = {};
-BASEMAPS['terrain'] = new L.TileLayer("http://{s}.tiles.mapbox.com/v3/greeninfo.map-fdff5ykx/{z}/{x}/{y}.jpg", { name:'Terrain', subdomains:['a','b','c','d'] });
-BASEMAPS['photo']   = new L.TileLayer("http://{s}.tiles.mapbox.com/v3/greeninfo.map-zudfckcw/{z}/{x}/{y}.jpg", { name:'Photo', subdomains:['a','b','c','d'] });
-//BASEMAPS['plain']   = new L.TileLayer("http://{s}.tiles.mapbox.com/v3/greeninfo.map-8ljrd2bt/{z}/{x}/{y}.jpg", { name:'Streets', subdomains:['a','b','c','d'] });
 
-// the name of a subdirectory where this app will store its content
-// this is particularly important on Android where filesystem is not a sandbox but your SD card
-var STORAGE_SUBDIR = "MobileMapStarter";
+// what folder should this application use, to store offline tiles?
+// passed as tge 'folder' parameter to L.TileLayer.Cordova
+var OFFLINE_TILE_FOLDER = "MobileMapStarter";
 
 // a Marker indicating our last-known geolocation, and a Circle indicating accuracy
 // Our present latlng can be had from LOCATION..getLatLng(), a useful thing for doing distance calculations
@@ -78,29 +77,21 @@ function init() {
     // pre-render the pages so we don't have that damnable lazy rendering thing messing with it
     $('div[data-role="page"]').page();
 
-    // start up the filesystem and then the map
-    initCacheThenMap();
-
-    // set up buttons, dialogs, etc.
+    // our startup, in phases so it's easier to keep track
+    initMap();
     initSettings();
     initGeocoder();
+
+    // ready, set go!
+    // pick the basemap, center on a default location, and begin watching location
+    selectBasemap('terrain');
+    MAP.setView(LOCATION.getLatLng(),DEFAULT_ZOOM);
+
+    MAP.on('locationfound', onLocationFound);
+    MAP.locate({ enableHighAccuracy:true, watch:true });
 }
 
 
-
-function initCacheThenMap() {
-    // initialize the filesystem where we store cached tiles. when this is ready, proceed with the map
-    CACHE = new OfflineTileCacher(STORAGE_SUBDIR);
-    CACHE.init(function () {
-        CACHE.registerLayer(BASEMAPS['terrain']);
-        CACHE.registerLayer(BASEMAPS['photo']);
-        initMap();
-        resizeMapIfVisible();
-    }, function () {
-        alert('Could not load the local filesystem. Exiting.');
-        return;
-    });
-}
 
 function initMap() {
     // load the map and its initial view
@@ -110,19 +101,39 @@ function initMap() {
         dragging: true,
         closePopupOnClick: false,
         crs: L.CRS.EPSG3857,
-        minZoom: MIN_ZOOM, maxZoom: MAX_ZOOM,
-        layers : [ BASEMAPS['terrain'], ACCURACY, LOCATION ]
+        minZoom: MIN_ZOOM, maxZoom: MAX_ZOOM
     });
-    MAP.setView(LOCATION.getLatLng(),DEFAULT_ZOOM);
+
+    // add the location marker and accuracy circle
+    MAP.addLayer(ACCURACY).addLayer(LOCATION);
+
+    // add the offine-enabled basemaps  L.TileLayer.Cordova
+    BASEMAPS['terrain'] = L.tileLayerCordova("http://{s}.tiles.mapbox.com/v3/greeninfo.map-fdff5ykx/{z}/{x}/{y}.jpg", {
+        subdomains:['a','b','c','d'],
+        maxZoom: 18,
+        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+                     '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+                     'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+        // now the Cordova-specific options
+        folder: OFFLINE_TILE_FOLDER,
+        name:'Terrain'
+    });
+    BASEMAPS['photo'] = L.tileLayerCordova("http://{s}.tiles.mapbox.com/v3/greeninfo.map-zudfckcw/{z}/{x}/{y}.jpg", {
+        subdomains:['a','b','c','d'],
+        maxZoom: 18,
+        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+                     '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+                     'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+        // now the Cordova-specific options
+        folder: OFFLINE_TILE_FOLDER,
+        name:'Photo'
+    });
 
     // move the geocoder and Settings button to inside the map_canvas, as it's more responsive to size changes that way
     $('.leaflet-control-settings').appendTo( $('#map_canvas') );
     $('#geocoder').appendTo( $('#map_canvas') );
 
-    // set up the event handler when our location is detected, and start continuous tracking
-    MAP.on('locationfound', onLocationFound);
-    MAP.locate({ enableHighAccuracy:true, watch:true });
-
+    //GDA tag for removal
     // Leaflet behavior patch: on a zoomend event, check whether we're at MIN_ZOOM or MAX_ZOOM and show/hide the +/- buttons in the Zoom control
     MAP.on('zoomend', function () {
         var z = MAP.getZoom();
@@ -162,6 +173,7 @@ function initSettings() {
     // enable the Clear Cache and Seed Cache buttons in Settings, and set up the progress bar
     $('#page-clearcache a[name="clearcache"]').click(function () {
         $.mobile.loading('show', {theme:"a", text:"Clearing cache", textonly:false, textVisible: true});
+//GDA this method has changed per L.TileLayer.Cordova
         CACHE.clearCache(function () {
             // on successful deletion, repopulate the disk usage boxes with what we know is 0
             $('#cachestatus_files').val('0 map tiles');
@@ -179,6 +191,7 @@ function initSettings() {
         var zmin  = MAP.getZoom();
         var zmax  = MAX_ZOOM;
 
+//GDA this method has changed per L.TileLayer.Cordova
         // fetch the assocarray of layername->layerobj from the Cache provider,
         // then figure out a list of the layernames too so we can seed them sequentially
         var layers_to_seed = CACHE.registeredLayers();
@@ -222,6 +235,7 @@ function initSettings() {
         return false;
     });
 
+    //GDA this method has changed per L.TileLayer.Cordova
     // enable the "Offline" checkbox to toggle all registered layers between offline & online mode
     $('#basemap_offline_checkbox').change(function () {
         var offline = $(this).is(':checked');
@@ -233,6 +247,7 @@ function initSettings() {
         }
     });
 
+    //GDA this method has changed per L.TileLayer.Cordova
     // enable the "Cache Status" checkbox to calculate the disk usage and write to to the dialog
     // allow the change to the dialog, and start the asynchronous disk usage calculation
     $('#page-settings a[href="#page-cachestatus"]').click(function () {
