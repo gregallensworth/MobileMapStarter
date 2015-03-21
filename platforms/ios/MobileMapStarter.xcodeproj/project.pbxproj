@@ -5,7 +5,6 @@
 	};
 	objectVersion = 46;
 	objects = {
-
 /* Begin PBXBuildFile section */
 		090C4CB3986B418E955D0046 /* CDVDevice.m in Sources */ = {isa = PBXBuildFile; fileRef = 052D6ADF464849518C9E9761 /* CDVDevice.m */; };
 		0A21EE7DF8D646C3B996E2F9 /* CDVFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 08293A626EB2498FB5BD0E36 /* CDVFile.m */; };
@@ -515,7 +514,7 @@
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = "";
 				INFOPLIST_FILE = "MobileMapStarter/MobileMapStarter-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
 				OTHER_LDFLAGS = (
 					"-weak_framework",
 					CoreFoundation,
@@ -546,7 +545,7 @@
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = "";
 				INFOPLIST_FILE = "MobileMapStarter/MobileMapStarter-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
 				OTHER_LDFLAGS = (
 					"-weak_framework",
 					CoreFoundation,
