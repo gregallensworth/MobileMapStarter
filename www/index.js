@@ -162,20 +162,44 @@ function initSettings() {
         $.mobile.changePage('#page-map')
     });
 
-    // enable the Clear Cache and Seed Cache buttons in Settings, and set up the progress bar
+    // enable the "Offline" checkbox to toggle all registered layers between offline & online mode
+    $('#basemap_offline_checkbox').change(function () {
+        var offline = $(this).is(':checked');
+        if (offline) {
+            switchBasemapsToOffline();
+        } else {
+            switchBasemapsToOnline();
+        }
+    });
+
+    // the "Cache Status" checkbox tallies up offline-tile-cache usage, and writes stats to the tetx inputs
+    // tip: this works since all L.TileLayer.Cordova use the same "folder" setting, so we ca pick any of them and getDiskUsage() returns stats for the whole pool for all basemaps
+    $('#page-settings a[href="#page-cachestatus"]').click(function () {
+        $('#cachestatus_files').val('Calculating');
+        $('#cachestatus_storage').val('Calculating');
+
+        BASEMAPS['terrain'].getDiskUsage(function (filecount,totalbytes) {
+            var megabytes = (totalbytes / 1048576).toFixed(1);
+            $('#cachestatus_files').val(filecount + ' ' + 'map tiles');
+            $('#cachestatus_storage').val(megabytes + ' ' + 'MB');
+        });
+    });
+
+    // enable the Clear Cache button in Settings
+    // tip: this works since all L.TileLayer.Cordova use the same "folder" setting, so we ca pick any of them and getDiskUsage() returns stats for the whole pool for all basemaps
     $('#page-clearcache a[name="clearcache"]').click(function () {
         $.mobile.loading('show', {theme:"a", text:"Clearing cache", textonly:false, textVisible: true});
-//GDA this method has changed per L.TileLayer.Cordova
-        CACHE.clearCache(function () {
-            // on successful deletion, repopulate the disk usage boxes with what we know is 0
-            $('#cachestatus_files').val('0 map tiles');
-            $('#cachestatus_storage').val('0 MB');
+        BASEMAPS['terrain'].emptyCache(function () {
+            $('#cachestatus_files').val('Emptied');
+            $('#cachestatus_storage').val('Emptied');
 
             $.mobile.changePage("#page-cachestatus");
             $.mobile.loading('hide');
         });
         return false;
     });
+
+    // enable the Seed Cache button in Settings
     $('#page-seedcache a[name="seedcache"]').click(function () {
         // the lon, lat, and zooms for seeding
         var lon   = MAP.getCenter().lng;
@@ -183,74 +207,32 @@ function initSettings() {
         var zmin  = MAP.getZoom();
         var zmax  = MAX_ZOOM;
 
-//GDA this method has changed per L.TileLayer.Cordova
-        // fetch the assocarray of layername->layerobj from the Cache provider,
-        // then figure out a list of the layernames too so we can seed them sequentially
-        var layers_to_seed = CACHE.registeredLayers();
-        var layernames = [];
-        for (var l in layers_to_seed) layernames[layernames.length] = layers_to_seed[l].options.name;
-        var last_layer_name = layernames[layernames.length-1];
+        // pick any of the Cordova-cached TileLayer basemaps; the pyramid calculations are the same no matetr what layer is used
+        var tile_list = BASEMAPS['terrain'].calculateXYZListFromPyramid(lat,lon,zmin,zmax);
 
-        function seedLayerByIndex(index) {
-            if (index >= layernames.length) {
-                // past the end, we're done
-                $.mobile.changePage("#page-settings");
-                return;
-            }
-            var layername = layernames[index];
-
-            var layer_complete = function(done,total) {
-                // hide the spinner
-                $.mobile.loading('hide');
-                // go on to the next layer
-                seedLayerByIndex(index+1);
-            }
-            var progress = function(done,total) {
-                // show or update the spinner
+        //GDA separate into a wrapper function, then wrap and loop to do photo also
+        var layername = 'terrain';
+        BASEMAPS['terrain'].downloadXYZList(
+            tile_list,
+            false, // no overwrite, skip/keep existing tiles
+            function (done,total) {
                 var percent = Math.round( 100 * parseFloat(done) / parseFloat(total) );
                 var text = layername + ': ' + done + '/' + total + ' ' + percent + '%';
                 $.mobile.loading('show', {theme:"a", text:text, textonly:false, textVisible: true});
-                // if we're now done, call the completion function to close the spinner
-                if (done>=total) layer_complete();
-            };
-            var error = function() {
-                alert('Download error!');
+            },
+            function () {
+                $.mobile.loading('show', {theme:"a", text:"Done", textonly:false, textVisible: true});
+                alert("Done!");
+                $.mobile.changePage("#page-settings");
+            },
+            function (error) {
+                alert("Failed\nError code: " + error.code);
+                $.mobile.changePage("#page-settings");
             }
-
-            CACHE.seedCache(layername,lat,lon,zmin,zmax,progress,error);
-        }
-
-        // start it off!
-        seedLayerByIndex(0);
+        );
 
         // cancel the button taking us back to the same page; that will happen in the progress() and error() handlers
         return false;
-    });
-
-    //GDA this method has changed per L.TileLayer.Cordova
-    // enable the "Offline" checkbox to toggle all registered layers between offline & online mode
-    $('#basemap_offline_checkbox').change(function () {
-        var offline = $(this).is(':checked');
-        var layers  = CACHE.registeredLayers();
-        if (offline) {
-            for (var layername in layers) CACHE.useLayerOffline(layername);
-        } else {
-            for (var layername in layers) CACHE.useLayerOnline(layername);
-        }
-    });
-
-    //GDA this method has changed per L.TileLayer.Cordova
-    // enable the "Cache Status" checkbox to calculate the disk usage and write to to the dialog
-    // allow the change to the dialog, and start the asynchronous disk usage calculation
-    $('#page-settings a[href="#page-cachestatus"]').click(function () {
-        $('#cachestatus_files').val('Calculating');
-        $('#cachestatus_storage').val('Calculating');
-
-        CACHE.getDiskUsage(function (filecount,totalbytes) {
-            var megabytes = (totalbytes / 1048576).toFixed(1);
-            $('#cachestatus_files').val(filecount + ' ' + 'map tiles');
-            $('#cachestatus_storage').val(megabytes + ' ' + 'MB');
-        });
     });
 }
 
@@ -278,6 +260,18 @@ function initGeocoder() {
 function selectBasemap(which) {
     for (var i in BASEMAPS) MAP.removeLayer(BASEMAPS[i]);
     MAP.addLayer(BASEMAPS[which],true);
+}
+
+
+/*
+ * Wrapper functions to set the basemaps to online and offline mode
+ * See also L.TileLayer.Cordova documentation
+ */
+function switchBasemapsToOffline() {
+    for (var i in BASEMAPS) BASEMAPS[i].goOffline(layername);
+}
+function switchBasemapsToOnline() {
+    for (var i in BASEMAPS) BASEMAPS[i].goOnline(layername);
 }
 
 
