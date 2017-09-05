@@ -6,7 +6,9 @@ https://github.com/gregallensworth/MobileMapStarter
 A starting framework for mobile maps using Cordova/Phonegap.
 A minimal but functional, standalone mobile app from which to build your own creations.
 
-_This is the jQuery Mobile version of MobileMapStarter_
+_This is the jQuery Mobile version of MobileMapStarter. It will not be actively maintained after 2016._
+
+_If you like Angular, try https://github.com/GreenInfo-Network/MobileMapStarter2 instead._
 
 _If you use Ionic, you may be interested in https://github.com/greeninfo/IonicMapStarter instead._
 
